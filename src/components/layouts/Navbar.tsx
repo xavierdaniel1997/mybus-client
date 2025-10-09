@@ -96,7 +96,8 @@ export default function Navbar({ isAdmin = false }: NavbarProps) {
             >
               <FaHeadset className="mr-2" /> Help
             </Link>
-            <button className="w-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-2 rounded-full hover:from-blue-600 hover:to-blue-800 transition">
+            <button className="cursor-pointer flex items-center text-gray-700 hover:text-blue-600 transition"
+            onClick={() => setIsDialogOpen(true)}>
               <FaUser className="mr-2" /> Sign In
             </button>
           </div>

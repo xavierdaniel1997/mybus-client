@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {useState} from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,14 +12,23 @@ import Image from "next/image";
 import logincover from "../../../public/logincover.png";
 import SignupForm from "../form/SignupForm";
 import OtpForm from "../form/OtpForm";
+import LoginForm from "../form/LoginForm";
+
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {verifyEmailSchema, VerifyEmailData} from "@/lib/validations/auth";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface AuthDialogProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
-export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
-  const [mode, setMode] = useState<"login" | "signup" | "otp">("login");
+export default function AuthDialog({open, onOpenChange}: AuthDialogProps) {
+  const [mode, setMode] = useState<"verifyEmail" | "login" | "signup" | "otp">(
+    "signup"
+  );
   const [internalOpen, setInternalOpen] = useState(false);
 
   const isControlled = open !== undefined;
@@ -31,13 +40,44 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
 
   const toggleMode = () =>
     setMode((prev) =>
-      prev === "login" ? "signup" : prev === "signup" ? "login" : "login"
+      prev === "login"
+        ? "verifyEmail"
+        : prev === "verifyEmail"
+        ? "login"
+        : "login"
     );
+
+  const {
+    register,
+    handleSubmit,
+    formState: {errors, isSubmitting},
+    reset
+  } = useForm<VerifyEmailData>({
+    resolver: zodResolver(verifyEmailSchema),
+  });
+
+  const onSubmit = async (data: VerifyEmailData) => {
+    try{
+      const response = await api.post("/auth/register", data);
+      if(response.status === 200){
+        toast.success("Otp send successfully")
+        reset()
+        setMode("otp")
+        sessionStorage.setItem("userEmail", data.email)
+      }
+      console.log("the response fo the verify email", response)
+    }catch(error){
+      toast.error("Failed to verify the mail")
+      console.log("Failed to verify the user email", error)
+    }   
+  }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
       <DialogContent
-        className="lg:max-w-3xl !w-[95vw] !md:w-[60vw]  p-0 overflow-hidden rounded-2xl shadow-2xl"
+        className={`${
+          mode === "signup" ? "lg:max-w-5xl" : "lg:max-w-4xl min-h-[500px]"
+        } !w-[95vw] !md:w-[60vw]  p-0 overflow-hidden rounded-2xl shadow-2xl`}
       >
         <div className="flex flex-col md:flex-row h-full">
           {/* ===== LEFT: Form Section ===== */}
@@ -48,6 +88,8 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   ? "Welcome Back"
                   : mode === "signup"
                   ? "Create Account"
+                  : mode === "verifyEmail"
+                  ? "Continue with Email"
                   : "Verify Your Email"}
               </DialogTitle>
 
@@ -56,52 +98,57 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   ? "Sign in to continue booking your trips"
                   : mode === "signup"
                   ? "Join MyBus to start your journey"
+                  : mode === "verifyEmail"
+                  ? "Enter your email address to receive a one-time password (OTP)"
                   : "Enter the 6-digit OTP sent to your email"}
               </DialogDescription>
             </DialogHeader>
 
             {/* ===== FORMS ===== */}
             <div className="mt-6">
-              {mode === "signup" && <SignupForm />}
-
-              {mode !== "otp" && (
-                <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-                  <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      Email
+              {mode === "verifyEmail" && (
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-center space-y-4">
+                  <div className="w-full">
+                    <div className="flex items-center mb-1">
+                    <label className="text-sm text-gray-700">
+                      Email <span className="text-red-600">*</span>
                     </label>
+                     {errors.email && (
+                      <p className="text-red-500 text-sm">
+                        {errors.email.message}
+                      </p>
+                    )}
+                    </div>
                     <input
-                      type="email"
+                      {...register("email")}
+                      // type="email"
                       placeholder="you@example.com"
                       required
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
                     />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      Password
-                    </label>
-                    <input
-                      type="password"
-                      placeholder="••••••••"
-                      required
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                    />
+                    
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-2 rounded-xl hover:from-blue-600 hover:to-blue-800 transition"
+                    disabled={isSubmitting}
+                    className="w-fit bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-2 rounded-xl hover:from-blue-600 hover:to-blue-800 transition"
                   >
-                    {mode === "login" ? "Sign In" : "Sign Up"}
+                    {isSubmitting ? "Sending..." : "Continue"}
                   </button>
                 </form>
               )}
 
+              {/* {mode !== "otp" && (
+                <form
+                  onSubmit={(e) => e.preventDefault()}
+                  className="space-y-4"
+                ></form>
+              )} */}
+
               {mode === "otp" && (
                 <div className="flex flex-col items-center justify-center mt-4">
-                  <OtpForm />
+                  <OtpForm setMode={setMode}/>
                   <p className="text-gray-500 text-sm mt-3 text-center">
                     Didn’t receive the code?{" "}
                     <span className="text-blue-600 hover:underline cursor-pointer">
@@ -110,11 +157,15 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   </p>
                 </div>
               )}
+
+              {mode === "signup" && <SignupForm mode="signup" />}
+
+              {mode === "login" && <LoginForm />}
             </div>
 
             {/* ===== FOOTER TEXT ===== */}
             {mode !== "otp" && (
-              <div className="text-center text-sm text-gray-600 mt-6">
+              <div className="text-center text-sm text-gray-600 mt-4">
                 {mode === "login" ? (
                   <>
                     Don’t have an account?{" "}

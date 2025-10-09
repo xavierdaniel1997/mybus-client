@@ -22,19 +22,27 @@ export default function SearchForm() {
   return (
     <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mx-auto w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] max-w-5xl">
       {/* ===== Tabs ===== */}
-      <div className="flex justify-around sm:justify-start gap-4 sm:gap-8 border-b pb-2 overflow-x-auto">
+      <div className="flex justify-around sm:justify-start gap-4 sm:gap-8 border-b overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.name}
             onClick={() => setActiveTab(tab.name)}
             className={`flex items-center gap-2 text-gray-700 font-medium pb-2 border-b-2 transition ${
               activeTab === tab.name
-                ? "border-red-500 text-red-600"
+                ? "border-blue-500 text-blue-600"
                 : "border-transparent"
             }`}
           >
-            <span className="text-xl">{tab.icon}</span>
-            <span className="whitespace-nowrap">{tab.name}</span>
+            <span className={`text-xl ${
+              activeTab === tab.name
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent"
+            }`}>{tab.icon}</span>
+            <span className={`whitespace-nowrap ${
+              activeTab === tab.name
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent"
+            }`}>{tab.name}</span>
           </button>
         ))}
       </div>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/layouts/Navbar";
 import SideBar from "@/components/layouts/Sidebar";
-import "../../app/global.css";
+import "../../app/globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,8 +25,8 @@ export default function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
+    // <html lang="en">
+      <div
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gray-100`}
       >
         {/* ======= Top Navbar ======= */}
@@ -42,7 +42,7 @@ export default function AdminLayout({
           {/* Main Content Area */}
           <main className="flex-1 p-6 overflow-y-auto">{children}</main>
         </div>
-      </body>
-    </html>
+      </div>
+    // </html>
   );
 }

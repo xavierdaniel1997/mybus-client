@@ -28,7 +28,7 @@ export default function Home() {
       </div>
 
       {/* ===== Booking Card (Overlapping) ===== */}
-      <div className="relative flex justify-center -mt-10 sm:-mt-14 md:-mt-25 z-20">
+      <div className="relative flex justify-center -mt-10 sm:-mt-14 md:-mt-20 z-20">
         <SearchForm/>  
       </div>
 
