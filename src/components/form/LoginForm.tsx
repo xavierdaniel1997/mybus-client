@@ -1,9 +1,37 @@
+"use client"
+
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import { LoginData, loginSchema } from "@/lib/validations/auth";
+import { handleApiError } from "@/lib/utils/handleApiError";
+import { api } from "@/lib/api";
+
 export default function LoginForm() {
+
+  const {
+    register,
+    handleSubmit,
+    formState: {errors, isSubmitting},
+    reset
+  } = useForm<LoginData>({
+    resolver: zodResolver(loginSchema)
+  })
+
+  const onSubmit = async (data: LoginData) => {
+    try{
+      const resposne = await api.post("/auth/login-user", data)
+      console.log("response from the login user", resposne)
+    }catch(error){
+      handleApiError(error)
+    }
+  }
+
   return (
-    <form className="flex flex-col items-center space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-center space-y-4">
       <div className="w-full">
         <label className="block text-sm text-gray-700 mb-1">Email</label>
         <input
+          {...register("email")}
           type="email"
           placeholder="you@example.com"
           required
@@ -14,6 +42,7 @@ export default function LoginForm() {
       <div className="w-full">
         <label className="block text-sm text-gray-700 mb-1">Password</label>
         <input
+          {...register("password")}
           type="password"
           placeholder="••••••••"
           required
@@ -25,7 +54,7 @@ export default function LoginForm() {
         type="submit"
         className="mt-2 w-fit bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-2 rounded-xl hover:from-blue-600 hover:to-blue-800 transition"
       >
-        Login
+        {isSubmitting ? "Loading..." : "Login"}
       </button>
     </form>
   );

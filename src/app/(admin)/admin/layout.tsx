@@ -1,34 +1,49 @@
-// src/app/admin/layout.tsx
-import Link from "next/link";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import SideBar from "@/components/layouts/Sidebar";
+import '../../../app/globals.css'
+import AdminNavbar from "@/components/layouts/AdminNavbar";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Admin Dashboard | MyBusGo",
+  description: "Admin management panel",
+};
+
+export default function AdminLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      {/* Sidebar */}
-      {/* <aside style={{ width: "250px", background: "#333", color: "#fff", padding: "1rem" }}>
-        <h2 style={{ marginBottom: "2rem" }}>Admin Panel</h2>
-        <nav>
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            <li style={{ marginBottom: "1rem" }}>
-              <Link href="/admin/dashboard">Dashboard</Link>
-            </li>
-            <li style={{ marginBottom: "1rem" }}>
-              <Link href="/admin/buses">Buses</Link>
-            </li>
-            <li style={{ marginBottom: "1rem" }}>
-              <Link href="/admin/bookings">Bookings</Link>
-            </li>
-            <li style={{ marginBottom: "1rem" }}>
-              <Link href="/admin/users">Users</Link>
-            </li>
-          </ul>
-        </nav>
-      </aside> */}
+    // <html lang="en">
+      <div
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gray-50`}
+      >
+         <div className="w-60 fixed left-0 top-0 h-full bg-white shadow-md z-10">
+        <SideBar />
+      </div>
 
-      {/* Main content */}
-      {/* <main style={{ flex: 1, padding: "2rem" }}>
-        {children}
-      </main> */}
-    </div>
+         <div className="flex-1 ml-60 flex flex-col">
+        {/* Admin Navbar */}
+        <div className="sticky top-0 z-20 shadow-sm">
+          <AdminNavbar />
+        </div>
+
+        {/* Page Content */}
+        <main className="flex-1 p-6">{children}</main>
+      </div>
+          
+      </div>
+    // </html>
   );
 }

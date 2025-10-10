@@ -15,6 +15,7 @@ import { resolve } from "path";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { AxiosError } from "axios";
+import { handleApiError } from "@/lib/utils/handleApiError";
 
 type Mode = "verifyEmail" | "login" | "signup" | "otp";
 
@@ -59,14 +60,17 @@ export default function OtpForm({setMode}:  OtpFormProps) {
         setMode("signup") 
       }
     }catch(error){
-      const axiosError = error as AxiosError<{ message: string }>;
-      if (axiosError.response?.data?.message) {
-      toast.error(axiosError.response.data.message);
-    } else {
-      toast.error("Something went wrong. Please try again.");
-    }
+    //   const axiosError = error as AxiosError<{ message: string }>;
+    //   if (axiosError.response?.data?.message) {
+    //   toast.error(axiosError.response.data.message);
+    // } else {
+    //   toast.error("Something went wrong. Please try again.");
+    // }
+    handleApiError(error)
     }
   };
+
+ 
 
   return (
      <form

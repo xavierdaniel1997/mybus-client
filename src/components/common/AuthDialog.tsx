@@ -19,7 +19,8 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {verifyEmailSchema, VerifyEmailData} from "@/lib/validations/auth";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-
+import { handleApiError } from "@/lib/utils/handleApiError";
+     
 interface AuthDialogProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -27,7 +28,7 @@ interface AuthDialogProps {
 
 export default function AuthDialog({open, onOpenChange}: AuthDialogProps) {
   const [mode, setMode] = useState<"verifyEmail" | "login" | "signup" | "otp">(
-    "signup"
+    "login"
   );
   const [internalOpen, setInternalOpen] = useState(false);
 
@@ -37,6 +38,10 @@ export default function AuthDialog({open, onOpenChange}: AuthDialogProps) {
   const handleOpenChange = isControlled
     ? onOpenChange
     : (v: boolean) => setInternalOpen(v);
+
+  const closeDialog = () => {
+  handleOpenChange?.(false);
+};
 
   const toggleMode = () =>
     setMode((prev) =>
@@ -67,10 +72,29 @@ export default function AuthDialog({open, onOpenChange}: AuthDialogProps) {
       }
       console.log("the response fo the verify email", response)
     }catch(error){
-      toast.error("Failed to verify the mail")
-      console.log("Failed to verify the user email", error)
+      // toast.error("Failed to verify the mail")
+      // console.log("Failed to verify the user email", error)
+       handleApiError(error)
     }   
   }
+
+
+   const handleResendOTP = async () => {
+    const email = sessionStorage.getItem("userEmail"); 
+      if (!email) {
+    toast.error("Email not found. Please verify your email again.");
+    return;
+  }
+      try{
+        const response = await api.post("/auth/resend-otp", {email})
+        if(response.status === 200){
+          toast.success(response.data.message)
+        }
+      }catch(error){
+        console.log("error form the resend otp", error)
+        handleApiError(error)
+      }
+    }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
@@ -151,14 +175,15 @@ export default function AuthDialog({open, onOpenChange}: AuthDialogProps) {
                   <OtpForm setMode={setMode}/>
                   <p className="text-gray-500 text-sm mt-3 text-center">
                     Didn’t receive the code?{" "}
-                    <span className="text-blue-600 hover:underline cursor-pointer">
+                    <span className="text-blue-600 hover:underline cursor-pointer"
+                    onClick={handleResendOTP}>
                       Resend OTP
                     </span>
                   </p>
                 </div>
               )}
 
-              {mode === "signup" && <SignupForm mode="signup" />}
+              {mode === "signup" && <SignupForm setMode={setMode} closeDialog={closeDialog} />}
 
               {mode === "login" && <LoginForm />}
             </div>
