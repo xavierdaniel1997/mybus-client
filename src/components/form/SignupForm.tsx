@@ -41,6 +41,7 @@ export default function SignupForm({setMode, closeDialog}:  SignupFormProps) {
         toast.success(response.data.message)
         closeDialog()
         setMode("login")
+        sessionStorage.removeItem("userEmail")
       }
     } catch (error) {
       handleApiError(error);

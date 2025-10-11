@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { GlobalToaster } from "@/components/common/GlobalToaster";
+import AppLoader from "@/components/layouts/AppLoader";
 
 export const metadata: Metadata = {
   title: "Bus Booking App",
@@ -13,8 +14,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen flex flex-col bg-gray-50"> 
+     <html lang="en">
+      <body className="relative">
+        <AppLoader />
         {children}
         <GlobalToaster/>
       </body>

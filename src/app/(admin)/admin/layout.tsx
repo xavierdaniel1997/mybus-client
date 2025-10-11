@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import SideBar from "@/components/layouts/Sidebar";
 import '../../../app/globals.css'
 import AdminNavbar from "@/components/layouts/AdminNavbar";
+import ProtectedAdminRoute from "@/components/auth/ProtectedAdminRoute";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +26,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // <html lang="en">
+    <ProtectedAdminRoute>
       <div
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gray-50`}
       >
@@ -44,6 +45,6 @@ export default function AdminLayout({
       </div>
           
       </div>
-    // </html>
+      </ProtectedAdminRoute>
   );
 }

@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {FaGauge, FaBus, FaTicket, FaUsers} from "react-icons/fa6";
+import {IoLogOut, IoSettingsSharp} from "react-icons/io5";
+import { BiSolidOffer } from "react-icons/bi";
 import mybuslogo from "../../../public/mybuslogo.png";
 
 export default function SideBar() {
@@ -13,7 +15,13 @@ export default function SideBar() {
     {name: "Dashboard", path: "/admin", icon: <FaGauge />},
     {name: "Buses", path: "/admin/buses", icon: <FaBus />},
     {name: "Bookings", path: "/admin/bookings", icon: <FaTicket />},
+    {name: "Offers", path: "/admin/offers", icon: <BiSolidOffer/> },
     {name: "Users", path: "/admin/users", icon: <FaUsers />},
+  ];
+
+  const otherMenuItems = [
+    {name: "Settings", path: "admin/settings", icon: <IoSettingsSharp/>},
+    // {name: "Logout", path: "", icon: <FaBus />},
   ];
 
   return (
@@ -29,8 +37,31 @@ export default function SideBar() {
         />
       </div>
       <nav>
-        <ul className="space-y-0.5">
+        <p className="py-2 text-gray-400 font-semibold">GENERAL</p>
+        <ul className="space-y-0.5 px-2">
           {menuItems.map((item) => {
+            const isActive = pathname === item.path;
+
+            return (
+              <li key={item.path}>
+                <Link
+                  href={item.path}
+                  className={`flex items-center gap-3 px-6 py-2 rounded-md transition-colors duration-200 ${
+                    isActive
+                      ? "bg-blue-600 text-white font-medium shadow-sm"
+                      : "hover:bg-blue-100 hover:text-blue-700"
+                  }`}
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  <span>{item.name}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="py-2 text-gray-400 font-semibold">OTHERS</p>
+        <ul className="space-y-0.5">
+          {otherMenuItems.map((item) => {
             const isActive = pathname === item.path;
 
             return (
@@ -49,6 +80,12 @@ export default function SideBar() {
               </li>
             );
           })}
+          <div className="flex items-center gap-3 px-6 py-3">
+            <span className="text-lg">
+              <IoLogOut />
+            </span>
+            <li className="">Logout</li>
+          </div>
         </ul>
       </nav>
     </aside>

@@ -1,30 +1,35 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import {useState} from "react";
 import {
   FaBars,
   FaTimes,
   FaTicketAlt,
   FaHeadset,
   FaUser,
+  FaAngleDown,
 } from "react-icons/fa";
 import mybuslogo from "../../../public/mybuslogo.png";
 import Link from "next/link";
 import AuthDialog from "../common/AuthDialog";
+import {useAuthStore} from "@/app/(store)/useAuthStore";
+import {IoLogOut} from "react-icons/io5";
 
 interface NavbarProps {
   isAdmin?: boolean;
 }
 
-export default function Navbar({ isAdmin = false }: NavbarProps) {
+export default function Navbar({isAdmin = false}: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [openDropDown, setOpenDropDown] = useState(false)
 
-  // Define dynamic classes
-  const containerPadding = isAdmin ? "px-0" : "px-6 lg:px-8";
-  const navHeight = isAdmin ? "h-14" : "h-16";
-  const logoSize = isAdmin ? 70 : 90;
+  const {user} = useAuthStore();
+
+  const handleToggleDropDown = () => {
+    setOpenDropDown(!openDropDown)
+  }
 
   return (
     <nav
@@ -32,15 +37,15 @@ export default function Navbar({ isAdmin = false }: NavbarProps) {
         isAdmin ? "py-2" : "py-3"
       }`}
     >
-      <div className={`max-w-7xl mx-auto ${containerPadding}`}>
+      <div className={`max-w-7xl mx-auto px-6 lg:px-8`}>
         {/* Navbar Container */}
-        <div className={`flex justify-between items-center ${navHeight}`}>
+        <div className={`flex justify-between items-center h-16`}>
           {/* Logo Section */}
           <Image
             src={mybuslogo}
             alt="MyBusGo Logo"
-            width={logoSize}
-            height={logoSize}
+            width={90}
+            height={90}
             priority
             className="object-cover object-center"
           />
@@ -65,11 +70,38 @@ export default function Navbar({ isAdmin = false }: NavbarProps) {
                 </Link>
               </>
             )}
-            <button className="cursor-pointer flex items-center text-gray-700 hover:text-blue-600 transition"
-            onClick={() => setIsDialogOpen(true)}>
-              <FaUser className="mr-2" />
-              {isAdmin ? "Admin Login" : "Login/Sign In"}
-            </button>
+            {user ? (
+              <div>
+                <div className="flex items-center text-gray-700 gap-1">
+                  <button className="cursor-pointer" onClick={handleToggleDropDown}>Hi, {user?.firstName}</button>
+                  <FaAngleDown />
+                </div>
+                {openDropDown && <div className="absolute top-20 right-36 text-gray-700 bg-gray-100 py-2 px-4">
+                  <ul>
+                    <button className="flex items-center gap-3 p-2">
+                      <span className="text-lg">
+                        <IoLogOut />
+                      </span>
+                      <li className="">Logout</li>
+                    </button>
+                    <button className="flex items-center gap-3 p-2">
+                      <span className="text-lg">
+                        <FaUser />
+                      </span>
+                      <li className="">Profile</li>
+                    </button>
+                  </ul>
+                </div>}
+              </div>
+            ) : (
+              <button
+                className="cursor-pointer flex items-center text-gray-700 hover:text-blue-600 transition"
+                onClick={() => setIsDialogOpen(true)}
+              >
+                <FaUser className="mr-2" />
+                Login/Sign In
+              </button>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -96,8 +128,10 @@ export default function Navbar({ isAdmin = false }: NavbarProps) {
             >
               <FaHeadset className="mr-2" /> Help
             </Link>
-            <button className="cursor-pointer flex items-center text-gray-700 hover:text-blue-600 transition"
-            onClick={() => setIsDialogOpen(true)}>
+            <button
+              className="cursor-pointer flex items-center text-gray-700 hover:text-blue-600 transition"
+              onClick={() => setIsDialogOpen(true)}
+            >
               <FaUser className="mr-2" /> Sign In
             </button>
           </div>

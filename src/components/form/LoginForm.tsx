@@ -5,8 +5,15 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import { LoginData, loginSchema } from "@/lib/validations/auth";
 import { handleApiError } from "@/lib/utils/handleApiError";
 import { api } from "@/lib/api";
+import { useAuthStore } from "@/app/(store)/useAuthStore";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-export default function LoginForm() {
+interface LoginFromProps {
+  closeDialog: () => void;
+}
+
+export default function LoginForm({closeDialog} : LoginFromProps) {
 
   const {
     register,
@@ -17,9 +24,21 @@ export default function LoginForm() {
     resolver: zodResolver(loginSchema)
   })
 
+  const {setAuth} = useAuthStore();
+  const router = useRouter()
+
   const onSubmit = async (data: LoginData) => {
     try{
       const resposne = await api.post("/auth/login-user", data)
+      toast.success(resposne.data.message)
+      reset()
+      closeDialog()
+      setAuth(resposne.data.user, resposne.data.accessToken)
+      if(resposne.data.user.role === "ADMIN"){
+        router.push("/admin")
+      }else{
+        router.push("/")
+      }
       console.log("response from the login user", resposne)
     }catch(error){
       handleApiError(error)

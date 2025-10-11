@@ -185,7 +185,7 @@ export default function AuthDialog({open, onOpenChange}: AuthDialogProps) {
 
               {mode === "signup" && <SignupForm setMode={setMode} closeDialog={closeDialog} />}
 
-              {mode === "login" && <LoginForm />}
+              {mode === "login" && <LoginForm closeDialog={closeDialog}/>}
             </div>
 
             {/* ===== FOOTER TEXT ===== */}
