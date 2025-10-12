@@ -7,9 +7,13 @@ import {FaGauge, FaBus, FaTicket, FaUsers} from "react-icons/fa6";
 import {IoLogOut, IoSettingsSharp} from "react-icons/io5";
 import { BiSolidOffer } from "react-icons/bi";
 import mybuslogo from "../../../public/mybuslogo.png";
+import { handleApiError } from "@/lib/utils/handleApiError";
+import { api } from "@/lib/api";
+import { useAuthStore } from "@/app/(store)/useAuthStore";
 
 export default function SideBar() {
   const pathname = usePathname();
+  const {clearAuth} = useAuthStore()
 
   const menuItems = [
     {name: "Dashboard", path: "/admin", icon: <FaGauge />},
@@ -23,6 +27,17 @@ export default function SideBar() {
     {name: "Settings", path: "admin/settings", icon: <IoSettingsSharp/>},
     // {name: "Logout", path: "", icon: <FaBus />},
   ];
+
+  const handleLogout = async () => {
+      try{
+        const response = await api.post("/auth/logout-user")
+        if(response.status === 200){
+          clearAuth()
+        }
+      }catch(error){
+        handleApiError(error)
+      }
+    }
 
   return (
     <aside className="fixed left-0 h-screen w-60 border-r bg-gray-100 text-gray-600 p-2">
@@ -80,12 +95,13 @@ export default function SideBar() {
               </li>
             );
           })}
-          <div className="flex items-center gap-3 px-6 py-3">
+          <button className="flex items-center gap-3 px-6 py-3 hover:bg-blue-100 cursor-pointer w-full"
+          onClick={handleLogout}>
             <span className="text-lg">
               <IoLogOut />
             </span>
             <li className="">Logout</li>
-          </div>
+          </button>
         </ul>
       </nav>
     </aside>

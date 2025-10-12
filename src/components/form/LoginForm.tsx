@@ -8,6 +8,8 @@ import { api } from "@/lib/api";
 import { useAuthStore } from "@/app/(store)/useAuthStore";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import AppLoader from "../layouts/AppLoader";
+import { useEffect, useState } from "react";
 
 interface LoginFromProps {
   closeDialog: () => void;
@@ -23,29 +25,47 @@ export default function LoginForm({closeDialog} : LoginFromProps) {
   } = useForm<LoginData>({
     resolver: zodResolver(loginSchema)
   })
-
+  
+  const [loading, setLoading] = useState(false)
   const {setAuth} = useAuthStore();
   const router = useRouter()
 
+  // Prefetch routes to improve navigation speed
+  useEffect(() => {
+    router.prefetch("/admin");
+    router.prefetch("/");
+  }, [router]);
+
+
   const onSubmit = async (data: LoginData) => {
+    setLoading(true)
     try{
-      const resposne = await api.post("/auth/login-user", data)
-      toast.success(resposne.data.message)
+      const response = await api.post("/auth/login-user", data)
+      toast.success(response.data.message)
       reset()
       closeDialog()
-      setAuth(resposne.data.user, resposne.data.accessToken)
-      if(resposne.data.user.role === "ADMIN"){
-        router.push("/admin")
-      }else{
-        router.push("/")
-      }
-      console.log("response from the login user", resposne)
+      setAuth(response.data.user, response.data.accessToken)
+      const targetRoute = response.data.user.role === "ADMIN" ? "/admin" : "/";
+      router.push(targetRoute);
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
     }catch(error){
       handleApiError(error)
+      setLoading(false)
+    }finally{
+      setLoading(false)
     }
   }
 
   return (
+    <>
+    {/* {loading && (
+      <div className="">
+        <AppLoader />
+      </div>  
+    )} */}
+    {loading && <AppLoader/>}  
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-center space-y-4">
       <div className="w-full">
         <label className="block text-sm text-gray-700 mb-1">Email</label>
@@ -76,5 +96,6 @@ export default function LoginForm({closeDialog} : LoginFromProps) {
         {isSubmitting ? "Loading..." : "Login"}
       </button>
     </form>
+    </>
   );
 }

@@ -72,8 +72,6 @@ export default function AuthDialog({open, onOpenChange}: AuthDialogProps) {
       }
       console.log("the response fo the verify email", response)
     }catch(error){
-      // toast.error("Failed to verify the mail")
-      // console.log("Failed to verify the user email", error)
        handleApiError(error)
     }   
   }

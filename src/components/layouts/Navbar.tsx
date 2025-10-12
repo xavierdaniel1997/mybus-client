@@ -15,6 +15,8 @@ import Link from "next/link";
 import AuthDialog from "../common/AuthDialog";
 import {useAuthStore} from "@/app/(store)/useAuthStore";
 import {IoLogOut} from "react-icons/io5";
+import { handleApiError } from "@/lib/utils/handleApiError";
+import { api } from "@/lib/api";
 
 interface NavbarProps {
   isAdmin?: boolean;
@@ -25,10 +27,21 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [openDropDown, setOpenDropDown] = useState(false)
 
-  const {user} = useAuthStore();
+  const {user, clearAuth} = useAuthStore();
 
   const handleToggleDropDown = () => {
     setOpenDropDown(!openDropDown)
+  }
+
+  const handleLogout = async () => {
+    try{
+      const response = await api.post("/auth/logout-user")
+      if(response.status === 200){
+        clearAuth()
+      }
+    }catch(error){
+      handleApiError(error)
+    }
   }
 
   return (
@@ -78,7 +91,9 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
                 </div>
                 {openDropDown && <div className="absolute top-20 right-36 text-gray-700 bg-gray-100 py-2 px-4">
                   <ul>
-                    <button className="flex items-center gap-3 p-2">
+                    <button className="flex items-center gap-3 p-2 cursor-pointer"
+                    onClick={handleLogout}
+                    >
                       <span className="text-lg">
                         <IoLogOut />
                       </span>
