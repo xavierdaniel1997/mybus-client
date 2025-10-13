@@ -26,7 +26,7 @@ const refreshAccessToken = async () => {
   } catch (error) {
     console.error('Failed to refresh token:', error);
     useAuthStore.getState().clearAuth(); // Clear auth state on failure
-    window.location.href = '/login'; // Redirect to login page
+    window.location.href = '/'; // Redirect to login page
     throw error;
   }
 };

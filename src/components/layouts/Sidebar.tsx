@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
-import {FaGauge, FaBus, FaTicket, FaUsers} from "react-icons/fa6";
+import {FaGauge, FaBus, FaTicket, FaUsers, FaLocationArrow} from "react-icons/fa6";
 import {IoLogOut, IoSettingsSharp} from "react-icons/io5";
 import { BiSolidOffer } from "react-icons/bi";
+import { FaRoute } from "react-icons/fa";
 import mybuslogo from "../../../public/mybuslogo.png";
 import { handleApiError } from "@/lib/utils/handleApiError";
 import { api } from "@/lib/api";
@@ -17,7 +18,8 @@ export default function SideBar() {
 
   const menuItems = [
     {name: "Dashboard", path: "/admin", icon: <FaGauge />},
-    {name: "Buses", path: "/admin/buses", icon: <FaBus />},
+    {name: "Buses", path: "/admin/buses", icon: <FaBus />},   
+    {name: "Location", path: "/admin/location", icon: <FaLocationArrow />},
     {name: "Bookings", path: "/admin/bookings", icon: <FaTicket />},
     {name: "Offers", path: "/admin/offers", icon: <BiSolidOffer/> },
     {name: "Users", path: "/admin/users", icon: <FaUsers />},
