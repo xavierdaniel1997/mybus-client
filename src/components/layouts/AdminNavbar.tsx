@@ -1,18 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { FaSearch, FaChevronDown, FaUserCircle } from "react-icons/fa";
 import { IoWalletOutline } from "react-icons/io5";
 import { FaRegBell } from "react-icons/fa";
 
 export default function AdminNavbar() {
-  const [selectedPeriod, setSelectedPeriod] = useState("This Year");
+   const pathname = usePathname();
+  const [pageTitle, setPageTitle] = useState("Dashboard");
+
+  useEffect(() => {
+    if (!pathname) return;
+
+    // Extract last segment of the route
+    const segments = pathname.split("/").filter(Boolean);
+    const lastSegment = segments[segments.length - 1] || "dashboard";
+
+    // Capitalize the first letter for display
+    const formatted = lastSegment
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+
+    setPageTitle(formatted);
+  }, [pathname]);
 
   return (
     <nav className="flex items-center justify-between bg-gray-50 px-6 py-4">
       {/* Left Section */}
       <div>
-        <h1 className="text-xl font-semibold text-gray-900">Dashboard</h1>
+        <h1 className="text-xl font-semibold text-gray-900">{pageTitle==="Admin" ? "Dashboard" : pageTitle}</h1>
       </div>
 
       {/* Right Section */}

@@ -272,7 +272,6 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               type="submit"
               className="bg-blue-700 hover:bg-blue-800 text-white font-medium px-6 py-2 rounded-sm transition"
             >
-              Add Location
               {isSubmitting ? "Location Adding..." : "Add Location"}
             </button>
           </div>

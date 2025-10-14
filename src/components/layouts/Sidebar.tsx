@@ -6,7 +6,7 @@ import {usePathname} from "next/navigation";
 import {FaGauge, FaBus, FaTicket, FaUsers, FaLocationArrow} from "react-icons/fa6";
 import {IoLogOut, IoSettingsSharp} from "react-icons/io5";
 import { BiSolidOffer } from "react-icons/bi";
-import { FaRoute } from "react-icons/fa";
+import { TbLayoutAlignLeftFilled } from "react-icons/tb";
 import mybuslogo from "../../../public/mybuslogo.png";
 import { handleApiError } from "@/lib/utils/handleApiError";
 import { api } from "@/lib/api";
@@ -23,6 +23,7 @@ export default function SideBar() {
     {name: "Bookings", path: "/admin/bookings", icon: <FaTicket />},
     {name: "Offers", path: "/admin/offers", icon: <BiSolidOffer/> },
     {name: "Users", path: "/admin/users", icon: <FaUsers />},
+    {name: "Seat Layout", path: "/admin/seatlayout", icon: <TbLayoutAlignLeftFilled />},
   ];
 
   const otherMenuItems = [

@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type {Metadata} from "next";
+import {Geist, Geist_Mono} from "next/font/google";
 import SideBar from "@/components/layouts/Sidebar";
-import '../../../app/globals.css'
+import "../../../app/globals.css";
 import AdminNavbar from "@/components/layouts/AdminNavbar";
 import ProtectedAdminRoute from "@/components/auth/ProtectedAdminRoute";
 
@@ -26,25 +26,24 @@ export default function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ProtectedAdminRoute>
+  
       <div
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gray-50`}
       >
-         <div className="w-60 fixed left-0 top-0 h-full bg-white shadow-md z-10">
-        <SideBar />
-      </div>
-
-         <div className="flex-1 ml-60 flex flex-col">
-        {/* Admin Navbar */}
-        <div className="sticky top-0 z-20 shadow-sm">
-          <AdminNavbar />
+        <div className="w-60 fixed left-0 top-0 h-full bg-white shadow-md z-10">
+          <SideBar />
         </div>
 
-        {/* Page Content */}
-        <main className="flex-1 p-6">{children}</main>
+        <div className="flex-1 ml-60 flex flex-col">
+          {/* Admin Navbar */}
+          <div className="sticky top-0 z-20 shadow-sm">
+            <AdminNavbar />
+          </div>
+
+          {/* Page Content */}
+          <main className="flex-1 p-6">{children}</main>
+        </div>
       </div>
-          
-      </div>
-      </ProtectedAdminRoute>
+  
   );
 }
