@@ -1,118 +1,246 @@
-import {FaRegSave} from "react-icons/fa";
-import { GiSteeringWheel } from "react-icons/gi";
-import { BsDoorOpen } from "react-icons/bs";
+"use client";
 
-const busSeatTypeName = [
-    {name: "Seat", icon: ""},
-    {name: "Driver", icon: <GiSteeringWheel/>},
-    {name: "Bearth", icon: ""},
-    {name: "Entrance", icon: <BsDoorOpen/>}
-]
+import { FaRegSave } from "react-icons/fa";
+import { useState } from "react";
+import SeatTypeLegend from "@/components/SeatLayout/SeatTypeLegend";
+import SeatGrid from "@/components/SeatLayout/SeatGrid";
+
 export default function SeatLayout() {
+  const [leftCols, setLeftCols] = useState(2);
+  const [leftRows, setLeftRows] = useState(8);
+  const [rightCols, setRightCols] = useState(2);
+  const [rightRows, setRightRows] = useState(8);
+  const [busType, setBusType] = useState("seater");
+  const [deck, setDeck] = useState(1);
+  const [extraRows, setExtraRows] = useState(3); // extra rows for seater+sleeper
+
+  const [layoutLower, setLayoutLower] = useState<{ id: string; type: string }[][]>([]);
+  const [layoutUpper, setLayoutUpper] = useState<{ id: string; type: string }[][]>([]);
+
+  /**
+   * 🔹 Helper to generate a deck layout
+   * @param type "seater" | "sleeper"
+   * @param deckLevel "L" | "U"
+   */
+  const generateBaseLayout = (type: string, deckLevel: "L" | "U") => {
+    const newLayout: { id: string; type: string }[][] = [];
+    const maxRows = Math.max(leftRows, rightRows);
+    const maxCols = leftCols + rightCols + 1;
+
+    for (let col = 0; col < maxCols; col++) {
+      newLayout.push([]);
+    }
+
+    let leftSeatNumber = 1;
+    let rightSeatNumber = 1;
+
+    for (let row = 0; row < maxRows; row++) {
+      // Left side
+      for (let col = 0; col < leftCols; col++) {
+        newLayout[col].push({
+          id: `${deckLevel}L${leftSeatNumber}`,
+          type,
+        });
+        leftSeatNumber++;
+      }
+
+      // Aisle
+      newLayout[leftCols].push({ id: "Aisle", type: "Aisle" });
+
+      // Right side
+      for (let col = 0; col < rightCols; col++) {
+        newLayout[leftCols + 1 + col].push({
+          id: `${deckLevel}R${rightSeatNumber}`,
+          type,
+        });
+        rightSeatNumber++;
+      }
+    }
+
+    return newLayout;
+  };
+
+  // 🔹 Main Layout Generator
+  const generateLayout = () => {
+    if (busType === "seater") {
+      setDeck(1);
+      setLayoutLower(generateBaseLayout("seater", "L"));
+      setLayoutUpper([]);
+    } else if (busType === "sleeper") {
+      setDeck(2);
+      setLayoutLower(generateBaseLayout("sleeper", "L"));
+      setLayoutUpper(generateBaseLayout("sleeper", "U"));
+    } else if (busType === "seater+sleeper") {
+      setDeck(2);
+
+      // --- Base layouts ---
+      const lowerLayout = generateBaseLayout("seater", "L");
+      const upperLayout = generateBaseLayout("sleeper", "U");
+
+      // --- Add extra rows to lower deck (seater) ---
+      const maxCols = leftCols + rightCols + 1;
+      const extraLayout: { id: string; type: string }[][] = Array.from(
+        { length: maxCols },
+        () => []
+      );
+
+      let extraLeftSeat = lowerLayout.flat().filter(s => s.id.startsWith("LL")).length + 1;
+      let extraRightSeat = lowerLayout.flat().filter(s => s.id.startsWith("LR")).length + 1;
+
+      for (let row = 0; row < extraRows; row++) {
+        // Left side
+        for (let col = 0; col < leftCols; col++) {
+          extraLayout[col].push({
+            id: `LL${extraLeftSeat}`,
+            type: "seater",
+          });
+          extraLeftSeat++;
+        }
+
+        // Aisle
+        extraLayout[leftCols].push({ id: "Aisle", type: "Aisle" });
+
+        // Right side
+        for (let col = 0; col < rightCols; col++) {
+          extraLayout[leftCols + 1 + col].push({
+            id: `LR${extraRightSeat}`,
+            type: "seater",
+          });
+          extraRightSeat++;
+        }
+      }
+
+      // Combine layouts (base + extra)
+      const updatedLower = lowerLayout.map((col, i) => [...col, ...extraLayout[i]]);
+
+      setLayoutLower(updatedLower);
+      setLayoutUpper(upperLayout);
+    }
+  };
+
+  // 🔹 Clear layout
+  const clearLayout = () => {
+    setLayoutLower([]);
+    setLayoutUpper([]);
+  };
+
   return (
     <div className="px-20 py-3">
-
-      {/* breadcrumb */}
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-700">
-            Create Seating Layout
-          </h1>
+        <h1 className="text-2xl font-semibold text-gray-700">Create Seating Layout</h1>
+        <button className="flex items-center bg-blue-600 text-gray-50 px-4 py-1.5 rounded-md cursor-pointer gap-2">
+          <FaRegSave /> Save
+        </button>
+      </div>
+
+      {/* Form Section */}
+      <div className="mt-10 flex flex-wrap gap-5 items-end">
+        {/* Bus Type */}
+        <div className="flex flex-col mb-1">
+          <label className="text-sm text-gray-600">Bus Type</label>
+          <select
+            className="border rounded-sm p-1.5 focus:ring focus:ring-blue-500 outline-none"
+            value={busType}
+            onChange={(e) => setBusType(e.target.value)}
+          >
+            <option value="" disabled>Select Bus Type</option>
+            <option value="seater">Seater</option>
+            <option value="seater+sleeper">Seater / Sleeper</option>
+            <option value="sleeper">Sleeper</option>
+          </select>
         </div>
-        <div>
-          <button className="flex items-center bg-blue-600 text-gray-50 px-4 py-1.5 rounded-md cursor-pointer gap-2">
-            <span>
-              <FaRegSave />
-            </span>
-            Save
+
+        {/* Input Fields */}
+        <div className="flex flex-col mb-1">
+          <label className="text-sm text-gray-600">L Cols</label>
+          <input
+            type="number"
+            className="w-20 border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
+            value={leftCols}
+            onChange={(e) => setLeftCols(Number(e.target.value))}
+          />
+        </div>
+
+        <div className="flex flex-col mb-1">
+          <label className="text-sm text-gray-600">L Rows</label>
+          <input
+            type="number"
+            className="w-20 border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
+            value={leftRows}
+            onChange={(e) => setLeftRows(Number(e.target.value))}
+          />
+        </div>
+
+        <div className="flex flex-col mb-1">
+          <label className="text-sm text-gray-600">R Cols</label>
+          <input
+            type="number"
+            className="w-20 border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
+            value={rightCols}
+            onChange={(e) => setRightCols(Number(e.target.value))}
+          />
+        </div>
+
+        <div className="flex flex-col mb-1">
+          <label className="text-sm text-gray-600">R Rows</label>
+          <input
+            type="number"
+            className="w-20 border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
+            value={rightRows}
+            onChange={(e) => setRightRows(Number(e.target.value))}
+          />
+        </div>
+
+        {/* Extra Rows Input (Visible for seater+sleeper) */}
+        {busType === "seater+sleeper" && (
+          <div className="flex flex-col mb-1">
+            <label className="text-sm text-gray-600">Extra Rows (Lower Deck)</label>
+            <input
+              type="number"
+              className="w-24 border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
+              value={extraRows}
+              onChange={(e) => setExtraRows(Number(e.target.value))}
+            />
+          </div>
+        )}
+
+        {/* Buttons */}
+        <div className="flex gap-2 mb-1">
+          <button
+            onClick={generateLayout}
+            className="p-1.5 bg-green-600 hover:bg-green-700 text-white rounded-md"
+          >
+            Generate
+          </button>
+          <button
+            onClick={clearLayout}
+            className="p-1.5 bg-blue-700/50 hover:bg-blue-600 text-gray-50 rounded-md"
+          >
+            Clear
           </button>
         </div>
       </div>
 
-      {/* create layout form */}
-      <div className="mt-7 flex gap-5">
-        <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600">
-                  Bus Type
-                </label>
-                <select
-                  className="border rounded-sm p-2 focus:ring focus:ring-blue-500 outline-none"
-                >
-                    <option value="">Seater</option>
-                    <option value="">Semi Sleeper</option>
-                    <option value="">Sleeper</option>
-                </select>
-        </div>
-        <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600">
-                  Deck
-                </label>
-                <select
-                  className="border rounded-sm p-2 focus:ring focus:ring-blue-500 outline-none"
-                >
-                    <option value="">1</option>
-                    <option value="">2</option>
-                </select>
-        </div>
-        <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600">
-                 Columns
-                </label>
-                <input
-                  type="number"
-                  id="colums"
-                  className="w-14 border rounded-sm py-2 px-1 focus:ring focus:ring-blue-500 outline-none"
-                  placeholder="16"
-                />
-        </div>
-        <div className="flex items-center gap-2">
-            <label className="ext-sm text-gray-600">
-                 Rows
-                </label>
-                <input
-                  type="number"
-                  id="latitude"
-                  className="w-14 border rounded-md py-2 px-1 focus:ring focus:ring-blue-500 outline-none"
-                  placeholder="2"
-                />
-        </div>
-        <button className="py-2 px-3 bg-blue-700 text-gray-50 rounded-md">Clear</button>
-      </div>
-
-      {/* layout section and name of seats */}
-
-      <div className="mt-10 flex justify-between">
-
-
-         <div className="flex items-center bg-gray-100 p-3 rounded-md shadow-md">
-          {/* Front section (driver + door) */}
-          <div className="flex flex-col justify-between w-full h-[190px]">
-            <div className="-rotate-90">
-              <GiSteeringWheel size={25}/>
-            </div>
-            {/* <div className=""> */}
-              <BsDoorOpen size={25}/>
-            {/* </div> */}
+      {/* Layout Display */}
+      <div className="mt-10 flex justify-between items-start">
+        <div className="flex gap-20">
+          <div>
+            <h2 className="font-semibold text-center mb-2 text-gray-600">Lower Deck</h2>
+            <SeatGrid layout={layoutLower} isUpperDeck={false} />
           </div>
+          {deck === 2 && layoutUpper.length > 0 && (
+            <div>
+              <h2 className="font-semibold text-center mb-2 text-gray-600">Upper Deck</h2>
+              <SeatGrid layout={layoutUpper} isUpperDeck={true} />
+            </div>
+          )}
         </div>
-
 
         <div className="space-y-3">
-            {busSeatTypeName.map((busTypes) => (
-               <div key={busTypes.name}>
-                <div className="flex items-center gap-3">
-                    {busTypes.icon ? <div className="w-10 h-10 flex justify-center items-center text-blue-500 rounded-sm text-xl border-2 border-blue-500">
-                        {busTypes.icon}
-                </div> : <div className="w-10 h-10 bg-blue-600 rounded-sm">
-                </div>}
-                <p>{busTypes.name}</p>
-            </div>
-               </div> 
-            ))}
-           
+          <SeatTypeLegend />
         </div>
       </div>
-
     </div>
   );
 }
