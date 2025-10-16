@@ -26,7 +26,8 @@ export default function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
-  
+
+    <ProtectedAdminRoute>
       <div
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gray-50`}
       >
@@ -44,6 +45,6 @@ export default function AdminLayout({
           <main className="flex-1 p-6">{children}</main>
         </div>
       </div>
-  
+  </ProtectedAdminRoute>
   );
 }
