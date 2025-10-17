@@ -15,13 +15,13 @@ export default function SeatGrid({ layout, isUpperDeck }: SeatGridProps) {
       {/* TOP VIEW (driver + door) */}
       {!isUpperDeck ? <div className="flex justify-between items-center mb-3 px-2">
         <div className="flex flex-col items-center">
-          <div className="w-10 h-10 flex justify-center items-center border-2 border-gray-500 text-gray-500 text-xl rounded-md">
+          <div className="w-8 h-8 flex justify-center items-center border-2 border-gray-500 text-gray-500 text-xl rounded-md">
             <BsDoorOpen />
           </div>
         </div>
 
         <div className="flex flex-col items-center">
-          <div className="w-10 h-10 flex justify-center items-center border-2 border-gray-500 text-gray-500 text-xl rounded-md">
+          <div className="w-8 h-8 flex justify-center items-center border-2 border-gray-400 text-gray-500 text-xl rounded-md">
             <GiSteeringWheel />
           </div>
         </div>
@@ -33,14 +33,14 @@ export default function SeatGrid({ layout, isUpperDeck }: SeatGridProps) {
           <div key={colIndex} className="flex flex-col items-center mx-1">
             {col.map((seat, index) =>
               seat.type === "Aisle" ? (
-                <div key={index} className="h-8 p-3" />
+                <div key={index} className="h-8 p-1" />
               ) : (
                 <div
                   key={seat.id}
-                  className={`${seat.type==="seater" ? "w-10 h-12" : "w-10 h-20"} bg-gray-500 hover:bg-gray-600 text-white text-xs flex justify-center items-center rounded-sm cursor-pointer mb-1`}
+                  className={`${seat.type==="seater" ? "w-8 h-8" : "w-8 h-12"} bg-gray-400 hover:bg-gray-600 text-white text-xs flex justify-center items-center rounded-sm cursor-pointer mb-1`}
                   
                 >
-                  {seat.id}
+                  <p className="text-xs">{seat.id}</p>
                 </div>
               )
             )}

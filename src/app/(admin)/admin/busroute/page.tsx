@@ -45,14 +45,14 @@ export default function BusRoute(){
         <button
           onClick={() => setCurrentStep((s) => Math.max(0, s - 1))}
           disabled={currentStep === 0}
-          className="px-4 py-2 border rounded-md text-gray-600 disabled:opacity-40"
+          className="px-4 py-1 border rounded-md text-gray-600 disabled:opacity-40"
         >
           Back
         </button>
         {currentStep < steps.length - 1 ? (
           <button
             onClick={() => setCurrentStep((s) => Math.min(steps.length - 1, s + 1))}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md"
+            className="px-6 py-1 bg-blue-600 text-white rounded-md"
           >
             Next
           </button>
