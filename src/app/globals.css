@@ -120,3 +120,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+@keyframes busRun {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(3px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
+.animate-busRun {
+  animation: busRun 0.5s linear infinite;
+}

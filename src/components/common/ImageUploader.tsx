@@ -1,14 +1,16 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaCloudUploadAlt, FaTrash } from "react-icons/fa";
 
 interface ImageUploaderProps {
   onChange?: (files: File[]) => void;
+  busImages?: string[];
 }
 
-export default function ImageUploader({ onChange }: ImageUploaderProps) {
+export default function ImageUploader({ onChange, busImages = []}: ImageUploaderProps) {
   const [files, setFiles] = useState<File[]>([]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -30,6 +32,8 @@ export default function ImageUploader({ onChange }: ImageUploaderProps) {
     },
     multiple: true,
   });
+
+  console.log("busImages busImages busImages.....", busImages)
 
   return (
     <div className="w-full">
@@ -55,8 +59,10 @@ export default function ImageUploader({ onChange }: ImageUploaderProps) {
         <div className="grid grid-cols-3 gap-3 mt-4">
           {files.map((file, index) => (
             <div key={index} className="relative group border rounded-md overflow-hidden">
-              <img
+              <Image
                 src={URL.createObjectURL(file)}
+                 width={300}
+                  height={128}
                 alt={file.name}
                 className="w-full h-32 object-cover"
               />
@@ -71,6 +77,7 @@ export default function ImageUploader({ onChange }: ImageUploaderProps) {
           ))}
         </div>
       )}
+
     </div>
   );
 }

@@ -3,18 +3,33 @@
 import {BusLayout} from "@/app/types/bus";
 import {api} from "@/lib/api";
 import {handleApiError} from "@/lib/utils/handleApiError";
-import {JSX, useEffect, useState} from "react";
+import {forwardRef, JSX, useEffect, useImperativeHandle, useState} from "react";
 import SeatGrid from "../SeatLayout/SeatGrid";
 import ImageUploader from "../common/ImageUploader";
 import SeatTypeLegend from "../SeatLayout/SeatTypeLegend";
-import { FaWifi, FaChargingStation, FaBottleWater, FaBed, FaCookieBite, FaLightbulb, FaVideo } from "react-icons/fa6";
+import { FaWifi, FaChargingStation, FaBottleWater, FaBed, FaCookieBite, FaLightbulb, FaVideo, FaBus } from "react-icons/fa6";
 import { GiPillow } from "react-icons/gi";
+import { toast } from "sonner";
+import { BusDetails, StepBusDetailsRef } from "@/app/types/AddBusDetails";
+
+// export interface StepBusDetailsRef {
+//   createBus: () => Promise<boolean>;
+// }
+
+interface StepBusDetailsProps {
+  busDetails: BusDetails;
+  setBusDetails: React.Dispatch<React.SetStateAction<BusDetails>>;
+  busId: string | null;
+  setBusId: React.Dispatch<React.SetStateAction<string | null>>;
+}
 
 
-export default function StepBusDetails() {
+
+const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(({ busDetails, setBusDetails, busId, setBusId }, ref) => {
   const [busLayout, setBusLayout] = useState<BusLayout[]>([]);
   const [selectLayout, setSelectLayout] = useState<BusLayout | null>(null);
   const [busImages, setBusImages] = useState<File[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
 
   const featureIcons: Record<string, JSX.Element> = {
@@ -28,26 +43,6 @@ export default function StepBusDetails() {
   pillow: <GiPillow className="text-pink-400 text-xl" />,
 };
 
-
-    // form state
-  const [busDetails, setBusDetails] = useState({
-    name: "",
-    registrationNo: "",
-    brand: "",
-    busType: "",
-    layoutId: "",
-    information: "",
-    features: {
-      wifi: false,
-      chargingPoint: false,
-      waterBottle: false,
-      blankets: false,
-      snacks: false,
-      readingLight: false,
-      cctv: false,
-      pillow: false,
-    },
-  });
 
   const getSeatingLayout = async () => {
     try {
@@ -77,12 +72,11 @@ export default function StepBusDetails() {
   };
 
 
-   // 🧠 handle form submission
-  const handleSubmit = async () => {
+   // handle form submission
+  const createBus = async (): Promise<boolean> => {
     try {
+      setIsLoading(true)
       const formData = new FormData();
-
-      // append text fields
       formData.append("name", busDetails.name);
       formData.append("registrationNo", busDetails.registrationNo);
       formData.append("brand", busDetails.brand);
@@ -96,27 +90,47 @@ export default function StepBusDetails() {
         formData.append("images", file);
       });
 
-      const response = await api.post("bus/create", formData, {
+      const response = await api.post("/mybus/add-new-bus", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
-      console.log("✅ Bus created successfully:", response.data);
-      alert("Bus created successfully!");
+      toast.success(response.data.message)
+      return response.data.data?._id || true
     } catch (error) {
+      setIsLoading(false)
       handleApiError(error);
+      return false
     }
   };
+
+   useImperativeHandle(ref, () => ({
+    createBus,
+  }));
+
+  useEffect(() => {
+  const fetchBusDetails = async () => {
+    if (busId) {
+      const response = await api.get(`/mybus/get-bus/${busId}`);
+      console.log("respons from the get bus detail", response)
+      setBusDetails(response.data.data);
+    }
+  };
+  fetchBusDetails();
+}, [busId]);
+
 
   const handleLayoutSelect = (id: string) => {
     const layout = busLayout.find((layout) => layout._id === id);
     setSelectLayout(layout || null);
+    setBusDetails((prev) => ({
+    ...prev,
+    layoutId: id,
+  }))
   };
 
   const totalSeats =
   (selectLayout?.lowerDeck?.reduce((sum, row) => sum + row.length, 0) || 0) +
   (selectLayout?.upperDeck?.reduce((sum, row) => sum + row.length, 0) || 0);
 
-  console.log("selected seating layout", totalSeats);
 
   return (
     <div className="flex bg-gray-100/70 rounded-md px-8 py-5 gap-10 text-gray-600">
@@ -203,74 +217,7 @@ export default function StepBusDetails() {
 
          <h3>Features</h3>
 
-         {/* <div className="flex flex-wrap gap-4 items-center">
-         <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 p-0 m-0">WiFi</label>
-          <input
-            type="checkbox"
-            className="border rounded-sm p-2 h-4 w-4"
-          />
-        </div>
-
-        <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 p-0 m-0">Charging Point</label>
-          <input
-            type="checkbox"
-            className="border rounded-sm p-2 h-4 w-4"
-          />
-        </div>
-
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 p-0 m-0">Water Bottle</label>
-          <input
-            type="checkbox"
-            className="border rounded-sm p-2 h-4 w-4"
-          />
-        </div>
-
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 p-0 m-0">Blankets</label>
-          <input
-            type="checkbox"
-            className="border rounded-sm p-2 h-4 w-4"
-          />
-        </div>
-
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 p-0 m-0">Snacks</label>
-          <input
-            type="checkbox"
-            className="border rounded-sm p-2 h-4 w-4"
-          />
-        </div>
-
-        <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 p-0 m-0">Reading Light</label>
-          <input
-            type="checkbox"
-            className="border rounded-sm p-2 h-4 w-4"
-          />
-        </div>
-
-        <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 p-0 m-0">CCTV</label>
-          <input
-            type="checkbox"
-            className="border rounded-sm p-2 h-4 w-4"
-          />
-        </div>
-
-        <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 p-0 m-0">Pillow</label>
-          <input
-            type="checkbox"
-            className="border rounded-sm p-2 h-4 w-4"
-          />
-        </div>
-
-        </div> */}
-
-       {/* 🧩 Selected Feature Icons Container */}
+       {/* Selected Feature Icons Container */}
 {Object.entries(busDetails.features).some(([_, value]) => value) && (
   <div className="">
     <h3 className="text-gray-700 text-sm font-semibold mb-2">Selected Features</h3>
@@ -314,6 +261,9 @@ export default function StepBusDetails() {
             <label className="text-sm text-gray-600">Information</label>
           </div>
           <textarea  
+          name="information"
+          value={busDetails.information}
+              onChange={handleChange}
             className="w-full border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
             placeholder="New Bus"
             rows={3}
@@ -328,7 +278,8 @@ export default function StepBusDetails() {
          <h3 className="mb-2">Drag and drop the images of bus</h3>
           <div>
             <ImageUploader
-              onChange={(files) => console.log("Selected bus images:", files)}
+              onChange={(files) => setBusImages(files)}
+              busImages={busDetails?.images}
             />
           </div>
         </div>
@@ -351,9 +302,26 @@ export default function StepBusDetails() {
       </div>
 
       {/* last row */}
-      <div>
+      <div className="flex flex-col justify-between">
         <SeatTypeLegend totalSeat={totalSeats}/>
+        <div>
+          {isLoading &&  <button
+  className="bg-blue-600 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-gray-50 min-w-[120px] transition hover:bg-blue-700 disabled:opacity-70"
+  disabled={isLoading}
+>
+  
+    <div className="flex items-center gap-2">
+      <FaBus className="text-white text-xl animate-busRun" />
+      <span>Running...</span>
+    </div>
+</button> } 
+
+        </div>
       </div>
     </div>
   );
-}
+})
+
+
+StepBusDetails.displayName = "StepBusDetails";
+export default StepBusDetails;
