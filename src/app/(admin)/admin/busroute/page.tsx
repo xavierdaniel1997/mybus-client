@@ -8,12 +8,13 @@ import StepRouteDetails from "@/components/steps/StepRouteDetails";
 import StepTripDetails from "@/components/steps/StepTripDetails";
 import StepSeatAllocation from "@/components/steps/StepSeatAllocation";
 import StepConfirmation from "@/components/steps/StepConfirmation";
-import { StepBusDetailsRef } from "@/app/types/AddBusDetails";
+import { StepBusDetailsRef } from "@/app/types/addBusType";
+
+
 
 export default function BusRoute() {
   const [currentStep, setCurrentStep] = useState(0);
   const busDetailsRef = useRef<StepBusDetailsRef>(null);
-
     // ✅ Persistent bus data stored here
   const [busId, setBusId] = useState<string | null>(null);
   const [busDetails, setBusDetails] = useState({

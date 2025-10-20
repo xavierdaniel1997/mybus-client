@@ -1,83 +1,105 @@
 "use client";
 
-import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaCloudUploadAlt, FaTrash } from "react-icons/fa";
 
 interface ImageUploaderProps {
   onChange?: (files: File[]) => void;
   busImages?: string[];
+  onRemoveExisting?: (remaining: string[]) => void;
 }
 
-export default function ImageUploader({ onChange, busImages = []}: ImageUploaderProps) {
-  const [files, setFiles] = useState<File[]>([]);
+export default function ImageUploader({
+  onChange,
+  busImages = [],
+  onRemoveExisting,
+}: ImageUploaderProps) {
+  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [objectUrls, setObjectUrls] = useState<string[]>([]);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const updatedFiles = [...files, ...acceptedFiles];
-    setFiles(updatedFiles);
-    onChange?.(updatedFiles);
-  }, [files, onChange]);
+  // keep existing images synced
+  useEffect(() => {
+    setExistingImages(busImages);
+  }, [busImages]);
 
-  const removeFile = (index: number) => {
-    const updatedFiles = files.filter((_, i) => i !== index);
-    setFiles(updatedFiles);
-    onChange?.(updatedFiles);
+  // generate preview URLs whenever new files change
+  useEffect(() => {
+    const urls = newFiles.map((f) => URL.createObjectURL(f));
+    setObjectUrls(urls);
+    return () => urls.forEach((u) => URL.revokeObjectURL(u));
+  }, [newFiles]);
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const updated = [...newFiles, ...acceptedFiles];
+      setNewFiles(updated);
+      onChange?.(updated);
+    },
+    [newFiles, onChange]
+  );
+
+  const removeNewFile = (index: number) => {
+    const updated = newFiles.filter((_, i) => i !== index);
+    setNewFiles(updated);
+    onChange?.(updated);
+  };
+
+  const removeExistingImage = (index: number) => {
+    const updated = existingImages.filter((_, i) => i !== index);
+    setExistingImages(updated);
+    onRemoveExisting?.(updated);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      "image/*": [],
-    },
+    accept: { "image/*": [] },
     multiple: true,
   });
 
-  console.log("busImages busImages busImages.....", busImages)
-
   return (
     <div className="w-full">
-      {/* Drop Area */}
       <div
         {...getRootProps()}
-        className={`border-2 border-dashed rounded-md p-6 text-center cursor-pointer transition 
-          ${isDragActive ? "border-blue-400 bg-blue-50" : "border-gray-300 bg-gray-50 hover:bg-gray-100"}`}
+        className={`border-2 border-dashed rounded-md p-6 text-center cursor-pointer transition ${
+          isDragActive ? "border-blue-400 bg-blue-50" : "border-gray-300 bg-gray-50 hover:bg-gray-100"
+        }`}
       >
         <input {...getInputProps()} />
         <FaCloudUploadAlt className="mx-auto text-3xl text-blue-500 mb-2" />
-        {isDragActive ? (
-          <p className="text-blue-600 font-medium">Drop the files here...</p>
-        ) : (
-          <p className="text-gray-500">
-            Drag & drop images here, or <span className="text-blue-600 font-medium">click to browse</span>
-          </p>
-        )}
+        <p className="text-gray-500">
+          Drag & drop images here, or <span className="text-blue-600 font-medium">click to browse</span>
+        </p>
       </div>
 
-      {/* Preview */}
-      {files.length > 0 && (
-        <div className="grid grid-cols-3 gap-3 mt-4">
-          {files.map((file, index) => (
-            <div key={index} className="relative group border rounded-md overflow-hidden">
-              <Image
-                src={URL.createObjectURL(file)}
-                 width={300}
-                  height={128}
-                alt={file.name}
-                className="w-full h-32 object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => removeFile(index)}
-                className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
-              >
-                <FaTrash size={14} />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-3 gap-3 mt-4">
+        {existingImages.map((url, idx) => (
+          <div key={`existing-${idx}`} className="relative group border rounded-md overflow-hidden">
+            <img src={url} alt={`existing-${idx}`} className="w-full h-32 object-cover" />
+            <button
+              type="button"
+              onClick={() => removeExistingImage(idx)}
+              className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+            >
+              <FaTrash size={14} />
+            </button>
+          </div>
+        ))}
 
+        {objectUrls.map((url, index) => (
+          <div key={`new-${index}`} className="relative group border rounded-md overflow-hidden">
+            <img src={url} alt={`preview-${index}`} className="w-full h-32 object-cover" />
+            <button
+              type="button"
+              onClick={() => removeNewFile(index)}
+              className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+            >
+              <FaTrash size={14} />
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

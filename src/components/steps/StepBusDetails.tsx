@@ -10,11 +10,9 @@ import SeatTypeLegend from "../SeatLayout/SeatTypeLegend";
 import { FaWifi, FaChargingStation, FaBottleWater, FaBed, FaCookieBite, FaLightbulb, FaVideo, FaBus } from "react-icons/fa6";
 import { GiPillow } from "react-icons/gi";
 import { toast } from "sonner";
-import { BusDetails, StepBusDetailsRef } from "@/app/types/AddBusDetails";
+import { BusDetails, StepBusDetailsRef } from "@/app/types/addBusType";
 
-// export interface StepBusDetailsRef {
-//   createBus: () => Promise<boolean>;
-// }
+
 
 interface StepBusDetailsProps {
   busDetails: BusDetails;
@@ -279,7 +277,7 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(({ bus
           <div>
             <ImageUploader
               onChange={(files) => setBusImages(files)}
-              busImages={busDetails?.images}
+              busImages={busDetails?.images || []}
             />
           </div>
         </div>
