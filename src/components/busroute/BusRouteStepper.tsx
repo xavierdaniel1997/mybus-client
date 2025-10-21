@@ -7,6 +7,7 @@ import {
   FaChair,
   FaCheckCircle,
 } from "react-icons/fa";
+import { TbArmchair } from "react-icons/tb";
 
 interface BusRouteStepperProps {
   currentStep: number;
@@ -17,7 +18,7 @@ const steps = [
   { id: 0, label: "Bus Details", icon: <FaBus /> },
   { id: 1, label: "Route Details", icon: <FaRoute /> },
   { id: 2, label: "Trip Details", icon: <FaClock /> },
-  { id: 3, label: "Seat Allocation", icon: <FaChair /> },
+  { id: 3, label: "Seat Allocation", icon: <TbArmchair /> },
   { id: 4, label: "Confirmation", icon: <FaCheckCircle /> },
 ];
 

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaCloudUploadAlt, FaTrash } from "react-icons/fa";
@@ -62,9 +63,8 @@ export default function ImageUploader({
     <div className="w-full">
       <div
         {...getRootProps()}
-        className={`border-2 border-dashed rounded-md p-6 text-center cursor-pointer transition ${
-          isDragActive ? "border-blue-400 bg-blue-50" : "border-gray-300 bg-gray-50 hover:bg-gray-100"
-        }`}
+        className={`border-2 border-dashed rounded-md p-6 text-center cursor-pointer transition ${isDragActive ? "border-blue-400 bg-blue-50" : "border-gray-300 bg-gray-50 hover:bg-gray-100"
+          }`}
       >
         <input {...getInputProps()} />
         <FaCloudUploadAlt className="mx-auto text-3xl text-blue-500 mb-2" />
@@ -76,7 +76,8 @@ export default function ImageUploader({
       <div className="grid grid-cols-3 gap-3 mt-4">
         {existingImages.map((url, idx) => (
           <div key={`existing-${idx}`} className="relative group border rounded-md overflow-hidden">
-            <img src={url} alt={`existing-${idx}`} className="w-full h-32 object-cover" />
+            <Image width={128}
+              height={128} src={url} alt={`existing-${idx}`} className="w-full h-32 object-cover" />
             <button
               type="button"
               onClick={() => removeExistingImage(idx)}
@@ -89,7 +90,9 @@ export default function ImageUploader({
 
         {objectUrls.map((url, index) => (
           <div key={`new-${index}`} className="relative group border rounded-md overflow-hidden">
-            <img src={url} alt={`preview-${index}`} className="w-full h-32 object-cover" />
+            <Image
+              width={128}
+              height={128} src={url} alt={`preview-${index}`} className="w-full h-32 object-cover" />
             <button
               type="button"
               onClick={() => removeNewFile(index)}

@@ -1,6 +1,11 @@
+// export interface StepBusDetailsRef {
+//   createBus: () => Promise<boolean>;
+// }
+
 export interface StepBusDetailsRef {
-  createBus: () => Promise<boolean>;
+  createBus: () => Promise<string | boolean>;
 }
+
 
 type BusFeatureKey =
   | "wifi"
