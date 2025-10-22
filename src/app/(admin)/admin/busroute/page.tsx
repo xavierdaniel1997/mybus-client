@@ -43,7 +43,7 @@ export default function BusRoute() {
       busId={busId}
       setBusId={setBusId}
     />,
-    <StepRouteDetails key="route" />,
+    <StepRouteDetails key="route" busId={busId || null}/>,
     <StepTripDetails key="trip" />,
     <StepSeatAllocation key="seat" />,
     <StepConfirmation key="confirm" />,
