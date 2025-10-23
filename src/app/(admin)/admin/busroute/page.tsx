@@ -4,7 +4,7 @@ import {useRef, useState} from "react";
 import {FaRoute} from "react-icons/fa";
 import BusRouteStepper from "@/components/busroute/BusRouteStepper";
 import StepBusDetails from "@/components/steps/StepBusDetails";
-import StepRouteDetails from "@/components/steps/StepRouteDetails";
+import StepRouteDetails, { StepRouteDetailsRef } from "@/components/steps/StepRouteDetails";
 import StepTripDetails from "@/components/steps/StepTripDetails";
 import StepSeatAllocation from "@/components/steps/StepSeatAllocation";
 import StepConfirmation from "@/components/steps/StepConfirmation";
@@ -13,6 +13,8 @@ import {StepBusDetailsRef} from "@/app/types/addBusType";
 export default function BusRoute() {
   const [currentStep, setCurrentStep] = useState(0);
   const busDetailsRef = useRef<StepBusDetailsRef>(null);
+  const routeDetailsRef = useRef<StepRouteDetailsRef>(null);
+
   // ✅ Persistent bus data stored here
   const [busId, setBusId] = useState<string | null>(null);
   const [busDetails, setBusDetails] = useState({
@@ -43,7 +45,7 @@ export default function BusRoute() {
       busId={busId}
       setBusId={setBusId}
     />,
-    <StepRouteDetails key="route" busId={busId || null}/>,
+    <StepRouteDetails key="route"  ref={routeDetailsRef}  busId={busId || null}/>,
     <StepTripDetails key="trip" />,
     <StepSeatAllocation key="seat" />,
     <StepConfirmation key="confirm" />,
@@ -55,6 +57,16 @@ export default function BusRoute() {
       if (busIdResponse && typeof busIdResponse === "string") {
         setBusId(busIdResponse);
         setCurrentStep((prev) => prev + 1);
+      }
+    }else if(currentStep === 1){
+      const routeId = await routeDetailsRef.current?.createRoute();
+      if (routeId) {
+        // You may store routeId in state if needed
+        console.log("Route created id:", routeId);
+        setCurrentStep((prev) => prev + 1);
+      } else {
+        // creation failed or was cancelled — do not advance
+        console.warn("Route creation failed or cancelled; staying on step.");
       }
     } else {
       setCurrentStep((s) => s + 1);
