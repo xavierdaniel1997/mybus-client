@@ -4,16 +4,19 @@ import {useRef, useState} from "react";
 import {FaRoute} from "react-icons/fa";
 import BusRouteStepper from "@/components/busroute/BusRouteStepper";
 import StepBusDetails from "@/components/steps/StepBusDetails";
-import StepRouteDetails, { StepRouteDetailsRef } from "@/components/steps/StepRouteDetails";
+import StepRouteDetails from "@/components/steps/StepRouteDetails";
 import StepTripDetails from "@/components/steps/StepTripDetails";
 import StepSeatAllocation from "@/components/steps/StepSeatAllocation";
 import StepConfirmation from "@/components/steps/StepConfirmation";
 import {StepBusDetailsRef} from "@/app/types/addBusType";
+import { StepRouteDetailsRef } from "@/app/types/busroute";
 
 export default function BusRoute() {
   const [currentStep, setCurrentStep] = useState(0);
   const busDetailsRef = useRef<StepBusDetailsRef>(null);
   const routeDetailsRef = useRef<StepRouteDetailsRef>(null);
+  const [routeId, setRouteId] = useState<string | null>(null);
+
 
   // ✅ Persistent bus data stored here
   const [busId, setBusId] = useState<string | null>(null);
@@ -45,7 +48,7 @@ export default function BusRoute() {
       busId={busId}
       setBusId={setBusId}
     />,
-    <StepRouteDetails key="route"  ref={routeDetailsRef}  busId={busId || null}/>,
+    <StepRouteDetails key="route"  ref={routeDetailsRef} routeId={routeId || null}  busId={busId || null}/>,
     <StepTripDetails key="trip" />,
     <StepSeatAllocation key="seat" />,
     <StepConfirmation key="confirm" />,
@@ -61,8 +64,7 @@ export default function BusRoute() {
     }else if(currentStep === 1){
       const routeId = await routeDetailsRef.current?.createRoute();
       if (routeId) {
-        // You may store routeId in state if needed
-        console.log("Route created id:", routeId);
+        setRouteId(routeId)
         setCurrentStep((prev) => prev + 1);
       } else {
         // creation failed or was cancelled — do not advance
