@@ -39,16 +39,16 @@ export default function MiniCalendar({
         Scheduled Days
       </h3>
       <p className="w-full text-xs text-gray-500 mb-4">Select dates from the calendar</p>
-      <div className="w-[300px] h-[240px] border rounded-md p-2 shadow-sm">
+      <div className="w-[350px] h-[290px] border rounded-md p-2 shadow-sm">
         {/* Header */}
         <div className="flex justify-between items-center mb-1.5">
           <button
-            className="p-2 hover:bg-gray-100 rounded-full"
+            className="p-3 hover:bg-gray-100 rounded-full"
             onClick={() => setCurrentMonth(currentMonth.subtract(1, "month"))}
           >
             <IoIosArrowBack size={16} />
           </button>
-          <span className="text-sm font-semibold">
+          <span className="text-md font-semibold">
             {currentMonth.format("MMMM YYYY")}
           </span>
           <button
@@ -60,14 +60,14 @@ export default function MiniCalendar({
         </div>
 
         {/* Weekdays */}
-        <div className="grid grid-cols-7 text-center text-[12px] text-gray-500 mb-1.5">
+        <div className="grid grid-cols-7 text-center text-[14px] text-gray-500 mb-2">
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
             <div key={d}>{d}</div>
           ))}
         </div>
 
         {/* Days */}
-        <div className="grid grid-cols-7 text-center text-[12px] gap-2">
+        <div className="grid grid-cols-7 text-center text-[14px] gap-3">
           {days.map((date) => {
             const inMonth = date.isSame(currentMonth, "month");
             const selected = isSelected(date);
