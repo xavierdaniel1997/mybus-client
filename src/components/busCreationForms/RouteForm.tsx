@@ -84,7 +84,9 @@ export default function RouteForm({
           name="source.landmark"
           control={control}
           render={({ field }) => (
-            <input {...field} className="border w-full rounded-sm py-1.5 px-1" placeholder="Landmark" />
+            <input {...field}
+            value={field.value || ""}
+            className="border w-full rounded-sm py-1.5 px-1" placeholder="Landmark" />
           )}
         />
       </div>
@@ -116,7 +118,9 @@ export default function RouteForm({
           name="destination.landmark"
           control={control}
           render={({ field }) => (
-            <input {...field} className="border w-full rounded-sm py-1.5 px-1" placeholder="Landmark" />
+            <input {...field} 
+            value={field.value || ""}
+            className="border w-full rounded-sm py-1.5 px-1" placeholder="Landmark" />
           )}
         />
       </div>

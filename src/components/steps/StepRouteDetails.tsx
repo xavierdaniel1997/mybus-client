@@ -23,7 +23,7 @@ import {
 } from "@/app/types/busroute";
 
 const StepRouteDetails = forwardRef<StepRouteDetailsRef, StepRouteDetailsProps>(
-  ({ busId, routeId }, ref) => {
+  ({ busId, routeId, routeDetail }, ref) => {
     const { control, handleSubmit, reset, setValue, watch, getValues } =
       useForm<FormData>({
         defaultValues: {
@@ -185,7 +185,6 @@ const StepRouteDetails = forwardRef<StepRouteDetailsRef, StepRouteDetailsProps>(
           const response = await api.get(`/myroute/route-detail/${routeId}`);
           if (response.status === 200 && response.data.data) {
             reset(response.data.data);
-            toast.success("Route details loaded.");
           }
         } catch (error) {
           handleApiError(error);
@@ -194,6 +193,7 @@ const StepRouteDetails = forwardRef<StepRouteDetailsRef, StepRouteDetailsProps>(
 
       fetchRouteDetails();
     }, [routeId, reset]);
+
 
     // ✅ Expose method for parent component
     useImperativeHandle(ref, () => ({
