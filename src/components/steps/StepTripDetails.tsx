@@ -8,7 +8,13 @@ import { IoMdClose } from "react-icons/io";
 import dayjs from "dayjs";
 import MiniCalendar from "../busCreationForms/MiniCalendar";
 
-export default function StepTripScheduler() {
+interface StepTripDetailsProps {
+  busId?: string | null;
+  routeId?: string | null;
+  routeDetail?: any;
+}
+
+export default function StepTripScheduler({ busId, routeId, routeDetail }: StepTripDetailsProps) {
   const { control, handleSubmit, watch, reset } = useForm<FormDataTrip>({
     defaultValues: {
       bus: "",

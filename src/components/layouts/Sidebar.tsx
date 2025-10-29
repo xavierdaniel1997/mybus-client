@@ -23,7 +23,7 @@ export default function SideBar() {
     {name: "Location", path: "/admin/location", icon: <FaLocationArrow />},
     {name: "Bookings", path: "/admin/bookings", icon: <FaTicket />},
     {name: "Offers", path: "/admin/offers", icon: <BiSolidOffer/> },
-    {name: "Users", path: "/admin/users", icon: <FaUsers />},
+    {name: "Users", path: "/admin/user", icon: <FaUsers />},
     {name: "Seat Layout", path: "/admin/seatlayout", icon: <TbLayoutAlignLeftFilled />},
   ];
 
