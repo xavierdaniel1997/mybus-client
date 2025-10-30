@@ -60,7 +60,7 @@ export default function BusRoute() {
     <StepTripDetails
       key="trip"
       routeId={routeId}
-      routeDetail={routeDetail}
+      routeDetail={routeDetail || null}
       busId={busId}
     />,
     <StepSeatAllocation key="seat" />,
@@ -102,9 +102,9 @@ export default function BusRoute() {
     };
 
     fetchRouteDetails();
-  }, []);
+  }, [routeId]);
 
-  console.log("this is the data of route form the main page", routeDetail);
+
 
   return (
     <div className="px-5 py-2">

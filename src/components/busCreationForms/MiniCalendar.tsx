@@ -39,7 +39,7 @@ export default function MiniCalendar({
         Scheduled Days
       </h3>
       <p className="w-full text-xs text-gray-500 mb-4">Select dates from the calendar</p>
-      <div className="w-[350px] h-[290px] border rounded-md p-2 shadow-sm">
+      <div className="w-[350px] h-[320px] border rounded-md p-2 shadow-sm">
         {/* Header */}
         <div className="flex justify-between items-center mb-1.5">
           <button

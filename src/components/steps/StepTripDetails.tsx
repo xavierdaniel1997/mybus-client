@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
 import TripForm from "../busCreationForms/TripForm";
 import { FormDataTrip } from "@/app/types/bustrip";
-import { IoMdClose } from "react-icons/io";
 import dayjs from "dayjs";
 import MiniCalendar from "../busCreationForms/MiniCalendar";
+import { RouteDetailsRes } from "@/app/types/busroute";
 
 interface StepTripDetailsProps {
   busId?: string | null;
   routeId?: string | null;
-  routeDetail?: any;
+  routeDetail?: RouteDetailsRes | null;
 }
 
 export default function StepTripScheduler({ busId, routeId, routeDetail }: StepTripDetailsProps) {
@@ -36,6 +36,36 @@ export default function StepTripScheduler({ busId, routeId, routeDetail }: StepT
   const [step, setStep] = useState<number>(1);
   const [scheduledDates, setScheduledDates] = useState<Date[]>([]);
 
+  // ✅ Pre-fill the form when routeDetail is available
+  useEffect(() => {
+    if (routeDetail) {
+      reset({
+        bus: routeDetail.bus?._id || "",
+        route: routeDetail._id || "",
+        departureTime: routeDetail.source?.time
+          ? convertTo24Hour(routeDetail.source.time)
+          : "",
+        arrivalTime: routeDetail.destination?.time
+          ? convertTo24Hour(routeDetail.destination.time)
+          : "",
+        basePrice: 0,
+        seatPricing: [],
+        status: "scheduled",
+      });
+    }
+  }, [routeDetail, reset]);
+
+  // 🕒 Utility to convert 8:20PM → 20:20 (for input type="time")
+  const convertTo24Hour = (timeStr: string) => {
+    const [time, modifier] = timeStr.split(/(AM|PM)/i);
+    const [rawHours, rawMinutes] = time.split(":").map(Number);
+    let hours = rawHours;
+    const minutes = rawMinutes;
+    if (modifier.toUpperCase() === "PM" && hours < 12) hours += 12;
+    if (modifier.toUpperCase() === "AM" && hours === 12) hours = 0;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  };
+
   const handleDateSelect = (date: Date) => {
     setScheduledDates((prev) => {
       const exists = prev.some((d) => dayjs(d).isSame(date, "day"));
@@ -43,12 +73,6 @@ export default function StepTripScheduler({ busId, routeId, routeDetail }: StepT
         ? prev.filter((d) => !dayjs(d).isSame(date, "day"))
         : [...prev, date];
     });
-  };
-
-  const removeScheduledDate = (date: Date) => {
-    setScheduledDates((prev) =>
-      prev.filter((d) => !dayjs(d).isSame(date, "day"))
-    );
   };
 
   const onSubmit = (data: FormDataTrip) => {
@@ -62,36 +86,31 @@ export default function StepTripScheduler({ busId, routeId, routeDetail }: StepT
     setStep(1);
   };
 
+  console.log("this is the data of route form the tripDetails routeDetails...", routeDetail);
+
   return (
-
-      <div className="p-6 flex flex-row gap-12">
-        {/* LEFT: FORM SECTION */}
-        <div className="flex-1 w-full">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-5 p-4"
-          >
-              <TripForm
-                control={control}
-                onNext={() => setStep(2)}
-                onSave={() => setStep(3)}
-                seatFieldsCount={fields.length}
-                appendSeat={append}
-                removeSeat={remove}
-              />
-
-          </form>
-        </div>
-
-        {/* RIGHT: MINI CALENDAR SECTION */}
-       
-          <div className="flex-1">
-            <MiniCalendar
-              selectedDates={scheduledDates}
-              onDateSelect={handleDateSelect}
-            />
-          </div>
+    <div className="p-6 flex flex-row gap-12">
+      {/* LEFT: FORM SECTION */}
+      <div className="flex-1 w-full">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 p-4">
+          <TripForm
+            control={control}
+            onNext={() => setStep(2)}
+            onSave={() => setStep(3)}
+            seatFieldsCount={fields.length}
+            appendSeat={append}
+            removeSeat={remove}
+          />
+        </form>
       </div>
-    
+
+      {/* RIGHT: MINI CALENDAR SECTION */}
+      <div className="flex-1">
+        <MiniCalendar
+          selectedDates={scheduledDates}
+          onDateSelect={handleDateSelect}
+        />
+      </div>
+    </div>
   );
 }

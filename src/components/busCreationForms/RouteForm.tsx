@@ -70,7 +70,7 @@ export default function RouteForm({
           />
         </Autocomplete>
 
-        <Controller
+        {/* <Controller
           name="source.time"
           control={control}
           render={({ field }) => (
@@ -78,7 +78,22 @@ export default function RouteForm({
              value={field.value || ""}
               className="border w-30 rounded-sm py-1.5 px-1" placeholder="Time" />
           )}
-        />
+        /> */}
+        <Controller
+  name="destination.time"
+  control={control}
+  render={({ field }) => (
+    <input
+      {...field}
+      type="time"
+      value={field.value || ""}
+      onChange={(e) => field.onChange(e.target.value)}
+      className="border w-30 rounded-sm py-1.5 px-1"
+      step="60"
+    />
+  )}
+/>
+
 
         <Controller
           name="source.landmark"
@@ -108,9 +123,17 @@ export default function RouteForm({
           name="destination.time"
           control={control}
           render={({ field }) => (
-            <input {...field} 
-            value={field.value || ""}
-            className="border w-30 rounded-sm py-1.5 px-1" placeholder="Time" />
+            // <input {...field} 
+            // value={field.value || ""}
+            // className="border w-30 rounded-sm py-1.5 px-1" placeholder="Time" />
+            <input
+      {...field}
+      type="time"
+      value={field.value || ""}
+      onChange={(e) => field.onChange(e.target.value)}
+      className="border w-30 rounded-sm py-1.5 px-1"
+      step="60"
+    />
           )}
         />
 
@@ -148,7 +171,15 @@ export default function RouteForm({
               name={`boardingPoints.${index}.time`}
               control={control}
               render={({ field }) => (
-                <input {...field} className="border  w-20 rounded-sm py-1.5 px-1" placeholder="Time" />
+                // <input {...field} className="border  w-20 rounded-sm py-1.5 px-1" placeholder="Time" />
+                <input
+      {...field}
+      type="time"
+      value={field.value || ""}
+      onChange={(e) => field.onChange(e.target.value)}
+      className="border w-30 rounded-sm py-1.5 px-1"
+      step="60"
+    />
               )}
             />
 
@@ -201,7 +232,15 @@ export default function RouteForm({
               name={`droppingPoints.${index}.time`}
               control={control}
               render={({ field }) => (
-                <input {...field} className="border w-20 rounded-sm py-1.5 px-1" placeholder="Time" />
+                // <input {...field} className="border w-20 rounded-sm py-1.5 px-1" placeholder="Time" />
+                <input
+      {...field}
+      type="time"
+      value={field.value || ""}
+      onChange={(e) => field.onChange(e.target.value)}
+      className="border w-30 rounded-sm py-1.5 px-1"
+      step="60"
+    />
               )}
             />
 
@@ -254,7 +293,15 @@ export default function RouteForm({
               name={`stops.${index}.time`}
               control={control}
               render={({ field }) => (
-                <input {...field} className="border w-20 rounded-sm py-1.5 px-1" placeholder="Time" />
+                // <input {...field} className="border w-20 rounded-sm py-1.5 px-1" placeholder="Time" />
+                <input
+      {...field}
+      type="time"
+      value={field.value || ""}
+      onChange={(e) => field.onChange(e.target.value)}
+      className="border w-30 rounded-sm py-1.5 px-1"
+      step="60"
+    />
               )}
             />
 
