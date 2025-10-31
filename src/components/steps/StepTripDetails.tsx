@@ -15,18 +15,36 @@ interface StepTripDetailsProps {
 }
 
 export default function StepTripScheduler({ busId, routeId, routeDetail }: StepTripDetailsProps) {
+  // const { control, handleSubmit, watch, reset } = useForm<FormDataTrip>({
+  //   defaultValues: {
+  //     bus: "",
+  //     route: "",
+  //     travelDate: undefined,
+  //     departureTime: "",
+  //     arrivalTime: "",
+  //     basePrice: 0,
+  //     seatPricing: [],
+  //     status: "scheduled",
+  //   },
+  // });
+
+
   const { control, handleSubmit, watch, reset } = useForm<FormDataTrip>({
-    defaultValues: {
-      bus: "",
-      route: "",
-      travelDate: undefined,
-      departureTime: "",
-      arrivalTime: "",
-      basePrice: 0,
-      seatPricing: [],
-      status: "scheduled",
-    },
-  });
+  defaultValues: {
+    bus: "",
+    route: "",
+    frequency: "daily",
+    departureTime: "",
+    arrivalTime: "",
+    basePrice: 0,
+    startDate: "",
+    endDate: "",
+    active: true,
+    seatPricing: [],
+    status: "scheduled",
+  },
+});
+
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -86,10 +104,28 @@ export default function StepTripScheduler({ busId, routeId, routeDetail }: StepT
     setStep(1);
   };
 
+  const watchStart = watch("startDate");
+const watchEnd = watch("endDate");
+
+useEffect(() => {
+  if (watchStart && watchEnd) {
+    const start = dayjs(watchStart);
+    const end = dayjs(watchEnd);
+    const range: Date[] = [];
+    let d = start;
+    while (d.isBefore(end) || d.isSame(end, "day")) {
+      range.push(d.toDate());
+      d = d.add(1, "day");
+    }
+    setScheduledDates(range);
+  }
+}, [watchStart, watchEnd]);
+
+
   console.log("this is the data of route form the tripDetails routeDetails...", routeDetail);
 
   return (
-    <div className="p-6 flex flex-row gap-12">
+    <div className="p-6 flex justify-between flex-row gap-16">
       {/* LEFT: FORM SECTION */}
       <div className="flex-1 w-full">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 p-4">

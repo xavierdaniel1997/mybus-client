@@ -4,14 +4,17 @@ export interface ISeatPricing {
   isAvailable: boolean;
 }
 
+
 export interface FormDataTrip {
   bus: string;
   route: string;
-  schedule?: string;
-  travelDate: string;
+  frequency: "daily" | "weekdays" | "custom";
   departureTime: string;
   arrivalTime: string;
   basePrice: number;
+  startDate: string;
+  endDate?: string;
+  active: boolean;
   seatPricing: ISeatPricing[];
-  status: "scheduled" | "cancelled" | "completed";
+  status: "scheduled" | "cancelled";
 }
