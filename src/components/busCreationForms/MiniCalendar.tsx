@@ -60,14 +60,14 @@ export default function MiniCalendar({
         </div>
 
         {/* Weekdays */}
-        <div className="grid grid-cols-7 text-center text-[18px] text-gray-500 mb-4">
+        <div className="grid grid-cols-7 text-center text-[16px] text-gray-500 mb-4">
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
             <div key={d}>{d}</div>
           ))}
         </div>
 
         {/* Days */}
-        <div className="grid grid-cols-7 text-center text-[16px] gap-3">
+        <div className="grid grid-cols-7 text-center text-[14px] gap-3">
           {days.map((date) => {
             const inMonth = date.isSame(currentMonth, "month");
             const selected = isSelected(date);
@@ -75,7 +75,7 @@ export default function MiniCalendar({
               <div
                 key={date.toString()}
                 onClick={() => handleDateClick(date)}
-                className={`cursor-pointer p-2 rounded-sm ${
+                className={`cursor-pointer p-1.5 rounded-sm ${
                   selected
                     ? "bg-blue-600 text-white"
                     : inMonth

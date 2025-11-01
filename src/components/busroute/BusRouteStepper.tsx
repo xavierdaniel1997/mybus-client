@@ -17,8 +17,8 @@ interface BusRouteStepperProps {
 const steps = [
   { id: 0, label: "Bus Details", icon: <FaBus /> },
   { id: 1, label: "Route Details", icon: <FaRoute /> },
-  { id: 2, label: "Trip Details", icon: <FaClock /> },
-  { id: 3, label: "Seat Allocation", icon: <TbArmchair /> },
+  { id: 2, label: "Trip Schedule", icon: <FaClock /> },
+  // { id: 3, label: "Seat Allocation", icon: <TbArmchair /> },
   { id: 4, label: "Confirmation", icon: <FaCheckCircle /> },
 ];
 

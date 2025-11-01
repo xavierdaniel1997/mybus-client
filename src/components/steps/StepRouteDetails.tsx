@@ -21,6 +21,7 @@ import {
   StepRouteDetailsRef,
   libraries,
 } from "@/app/types/busroute";
+import { FaBus } from "react-icons/fa6";
 
 const StepRouteDetails = forwardRef<StepRouteDetailsRef, StepRouteDetailsProps>(
   ({ busId, routeId, routeDetail }, ref) => {
@@ -159,8 +160,8 @@ const StepRouteDetails = forwardRef<StepRouteDetailsRef, StepRouteDetailsProps>(
         type === "boardingPoints"
           ? appendBoarding
           : type === "droppingPoints"
-          ? appendDropping
-          : appendStop;
+            ? appendDropping
+            : appendStop;
       append({ name: "", lat: 0, lng: 0, time: "", landmark: "" });
     };
 
@@ -172,8 +173,8 @@ const StepRouteDetails = forwardRef<StepRouteDetailsRef, StepRouteDetailsProps>(
         type === "boardingPoints"
           ? removeBoarding
           : type === "droppingPoints"
-          ? removeDropping
-          : removeStop;
+            ? removeDropping
+            : removeStop;
       remove(index);
     };
 
@@ -283,7 +284,7 @@ const StepRouteDetails = forwardRef<StepRouteDetailsRef, StepRouteDetailsProps>(
           </div>
 
           {/* Save Button */}
-          <div className="flex justify-end mt-4">
+          {loadingCreate && <div className="flex justify-end mt-4">
             <button
               type="button"
               className="px-4 py-1 bg-blue-600 text-white rounded-md"
@@ -294,9 +295,12 @@ const StepRouteDetails = forwardRef<StepRouteDetailsRef, StepRouteDetailsProps>(
                 if (id) console.log("Created route ID:", id);
               }}
             >
-              {loadingCreate ? "Saving..." : "Save Route"}
+              <div className="flex items-center gap-2">
+                <FaBus className="text-white text-xl animate-busRun" />
+                <span>Uploading...</span>
+              </div>
             </button>
-          </div>
+          </div>}
         </div>
       </form>
     );

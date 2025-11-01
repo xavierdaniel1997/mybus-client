@@ -120,7 +120,7 @@ export default function RouteForm({
         </Autocomplete>
 
         <Controller
-          name="destination.time"
+          name="source.time"
           control={control}
           render={({ field }) => (
             // <input {...field} 

@@ -10,8 +10,8 @@ import { IoMdClose } from "react-icons/io";
 
 interface TripFormProps {
   control: Control<FormDataTrip>;
-  onNext: () => void;
-  onSave?: () => void;
+  // onNext: () => void;
+  // onSave?: () => void;
   seatFieldsCount: number;
   appendSeat: UseFieldArrayAppend<FormDataTrip, "seatPricing">;
   removeSeat: UseFieldArrayRemove;
@@ -19,8 +19,8 @@ interface TripFormProps {
 
 export default function TripForm({
   control,
-  onNext,
-  onSave,
+  // onNext,
+  // onSave,
   seatFieldsCount,
   appendSeat,
   removeSeat,

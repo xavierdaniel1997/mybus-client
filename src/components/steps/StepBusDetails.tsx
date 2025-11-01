@@ -366,7 +366,7 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
               >
                 <div className="flex items-center gap-2">
                   <FaBus className="text-white text-xl animate-busRun" />
-                  <span>Running...</span>
+                  <span>Uploading...</span>
                 </div>
               </button>
             )}

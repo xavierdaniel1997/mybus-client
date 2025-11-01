@@ -5,7 +5,9 @@ import {FaRoute} from "react-icons/fa";
 import BusRouteStepper from "@/components/busroute/BusRouteStepper";
 import StepBusDetails from "@/components/steps/StepBusDetails";
 import StepRouteDetails from "@/components/steps/StepRouteDetails";
-import StepTripDetails from "@/components/steps/StepTripDetails";
+import StepTripDetails, {
+  StepTripSchedulerRef,
+} from "@/components/steps/StepTripDetails";
 import StepSeatAllocation from "@/components/steps/StepSeatAllocation";
 import StepConfirmation from "@/components/steps/StepConfirmation";
 import {StepBusDetailsRef} from "@/app/types/addBusType";
@@ -17,6 +19,7 @@ export default function BusRoute() {
   const [currentStep, setCurrentStep] = useState(0);
   const busDetailsRef = useRef<StepBusDetailsRef>(null);
   const routeDetailsRef = useRef<StepRouteDetailsRef>(null);
+  const tripDetailsRef = useRef<StepTripSchedulerRef>(null);
   const [routeId, setRouteId] = useState<string | null>(null);
   const [routeDetail, setRouteDetail] = useState(null);
 
@@ -59,11 +62,12 @@ export default function BusRoute() {
     />,
     <StepTripDetails
       key="trip"
+      ref={tripDetailsRef}
       routeId={routeId}
       routeDetail={routeDetail || null}
       busId={busId}
     />,
-    <StepSeatAllocation key="seat" />,
+    // <StepSeatAllocation key="seat" />,
     <StepConfirmation key="confirm" />,
   ];
 
@@ -80,8 +84,15 @@ export default function BusRoute() {
         setRouteId(routeId);
         setCurrentStep((prev) => prev + 1);
       } else {
-        // creation failed or was cancelled — do not advance
         console.warn("Route creation failed or cancelled; staying on step.");
+      }
+    } else if (currentStep === 2) {
+      const tripId = await tripDetailsRef.current?.createTrip();
+      if (tripId) {
+        console.log("Trip created with ID:", tripId);
+        setCurrentStep((prev) => prev + 1);
+      } else {
+        console.warn("Trip creation failed; staying on step.");
       }
     } else {
       setCurrentStep((s) => s + 1);
@@ -103,8 +114,6 @@ export default function BusRoute() {
 
     fetchRouteDetails();
   }, [routeId]);
-
-
 
   return (
     <div className="px-5 py-2">
