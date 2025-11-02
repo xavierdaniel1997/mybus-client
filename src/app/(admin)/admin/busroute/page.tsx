@@ -8,7 +8,6 @@ import StepRouteDetails from "@/components/steps/StepRouteDetails";
 import StepTripDetails, {
   StepTripSchedulerRef,
 } from "@/components/steps/StepTripDetails";
-import StepSeatAllocation from "@/components/steps/StepSeatAllocation";
 import StepConfirmation from "@/components/steps/StepConfirmation";
 import {StepBusDetailsRef} from "@/app/types/addBusType";
 import {StepRouteDetailsRef} from "@/app/types/busroute";
@@ -21,6 +20,7 @@ export default function BusRoute() {
   const routeDetailsRef = useRef<StepRouteDetailsRef>(null);
   const tripDetailsRef = useRef<StepTripSchedulerRef>(null);
   const [routeId, setRouteId] = useState<string | null>(null);
+  const [tripId, setTripId] = useState<string | null>(null);
   const [routeDetail, setRouteDetail] = useState(null);
 
   // ✅ Persistent bus data stored here
@@ -66,6 +66,7 @@ export default function BusRoute() {
       routeId={routeId}
       routeDetail={routeDetail || null}
       busId={busId}
+      tripId={tripId || null}
     />,
     // <StepSeatAllocation key="seat" />,
     <StepConfirmation key="confirm" />,
@@ -90,6 +91,7 @@ export default function BusRoute() {
       const tripId = await tripDetailsRef.current?.createTrip();
       if (tripId) {
         console.log("Trip created with ID:", tripId);
+        setTripId(tripId)
         setCurrentStep((prev) => prev + 1);
       } else {
         console.warn("Trip creation failed; staying on step.");
