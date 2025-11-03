@@ -14,6 +14,7 @@ import MiniCalendar from "../busCreationForms/MiniCalendar";
 import {RouteDetailsRes} from "@/app/types/busroute";
 import {api} from "@/lib/api";
 import {handleApiError} from "@/lib/utils/handleApiError";
+import { FaBus } from "react-icons/fa6";
 
 export interface StepTripSchedulerRef {
   createTrip: () => Promise<string | null>;
@@ -30,6 +31,7 @@ const StepTripScheduler = forwardRef<
   StepTripSchedulerRef,
   StepTripDetailsProps
 >(({busId, routeId, routeDetail, tripId}, ref) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const {control, handleSubmit, watch, reset} = useForm<FormDataTrip>({
     defaultValues: {
       bus: busId || "",
@@ -52,6 +54,8 @@ const StepTripScheduler = forwardRef<
   });
 
   const [scheduledDates, setScheduledDates] = useState<Date[]>([]);
+
+
 
   useEffect(() => {
     const fetchTripDetails = async () => {
@@ -89,37 +93,78 @@ const StepTripScheduler = forwardRef<
 
   // 📅 Handle date selection for mini calendar
   const handleDateSelect = (date: Date) => {
-    setScheduledDates((prev) => {
-      const exists = prev.some((d) => dayjs(d).isSame(date, "day"));
-      return exists
-        ? prev.filter((d) => !dayjs(d).isSame(date, "day"))
-        : [...prev, date];
-    });
-  };
+  if (watchFrequency !== "custom") return; // disable manual clicks for daily/weekdays
+
+  setScheduledDates((prev) => {
+    const exists = prev.some((d) => dayjs(d).isSame(date, "day"));
+    return exists
+      ? prev.filter((d) => !dayjs(d).isSame(date, "day"))
+      : [...prev, date];
+  });
+};
+
 
   // 🗓️ Auto-generate full date range
   const watchStart = watch("startDate");
   const watchEnd = watch("endDate");
+    const watchFrequency = watch("frequency");
+
+  // useEffect(() => {
+  //   if (watchStart && watchEnd) {
+  //     const start = dayjs(watchStart);
+  //     const end = dayjs(watchEnd);
+  //     if (!start.isValid() || !end.isValid()) return;
+
+  //     const range: Date[] = [];
+  //     let d = start;
+  //     while (d.isBefore(end) || d.isSame(end, "day")) {
+  //       range.push(d.toDate());
+  //       d = d.add(1, "day");
+  //     }
+  //     setScheduledDates(range);
+  //   }
+  // }, [watchStart, watchEnd]);
+
 
   useEffect(() => {
-    if (watchStart && watchEnd) {
-      const start = dayjs(watchStart);
-      const end = dayjs(watchEnd);
-      if (!start.isValid() || !end.isValid()) return;
+  if (!watchStart || !watchEnd) return;
+  const start = dayjs(watchStart);
+  const end = dayjs(watchEnd);
+  if (!start.isValid() || !end.isValid()) return;
 
-      const range: Date[] = [];
-      let d = start;
-      while (d.isBefore(end) || d.isSame(end, "day")) {
-        range.push(d.toDate());
-        d = d.add(1, "day");
-      }
-      setScheduledDates(range);
+  if (watchFrequency === "daily") {
+    // all days in range
+    const range: Date[] = [];
+    let d = start;
+    while (d.isBefore(end) || d.isSame(end, "day")) {
+      range.push(d.toDate());
+      d = d.add(1, "day");
     }
-  }, [watchStart, watchEnd]);
+    setScheduledDates(range);
+  } 
+  else if (watchFrequency === "weekdays") {
+    // only Mon–Fri
+    const range: Date[] = [];
+    let d = start;
+    while (d.isBefore(end) || d.isSame(end, "day")) {
+      if (d.day() >= 1 && d.day() <= 5) {
+        range.push(d.toDate());
+      }
+      d = d.add(1, "day");
+    }
+    setScheduledDates(range);
+  }
+  else if (watchFrequency === "custom") {
+    // don't auto-generate anything — user will pick dates manually
+    setScheduledDates((prev) => prev); // keep user’s manual selection
+  }
+}, [watchStart, watchEnd, watchFrequency]);
+
 
   // ⚙️ Define the save function (used by parent)
   useImperativeHandle(ref, () => ({
     async createTrip() {
+      setIsLoading(true);
       const data = watch(); // get current form values
       const payload = {
         ...data,
@@ -132,11 +177,11 @@ const StepTripScheduler = forwardRef<
 
       try {
         const res = await api.post("/mytrips/schedule-trip", payload);
-        if (res.status === 200 && res.data?.data?._id) {
-          console.log("Trip created:", res.data.data);
-          return res.data.data._id;
+        if (res.status === 200 && res.data?.schedule?._id) {
+          return res.data.schedule._id;
         }
       } catch (error) {
+        setIsLoading(false);
         handleApiError(error);
         return null;
       }
@@ -160,7 +205,21 @@ const StepTripScheduler = forwardRef<
         <MiniCalendar
           selectedDates={scheduledDates}
           onDateSelect={handleDateSelect}
+          disabled={watchFrequency !== "custom"}
         />
+        <div className="flex justify-end mt-9">
+                    {isLoading && (
+                      <button
+                        className="bg-blue-600 flex items-center justify-center gap-2 px-4 py-1.5 rounded-md text-gray-50 min-w-[120px] transition hover:bg-blue-700 disabled:opacity-70"
+                        disabled={isLoading}
+                      >
+                        <div className="flex items-center gap-2">
+                          <FaBus className="text-white text-xl animate-busRun" />
+                          <span>Uploading...</span>
+                        </div>
+                      </button>
+                    )} 
+                  </div>
       </div>
     </div>
   );

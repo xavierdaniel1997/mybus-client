@@ -68,6 +68,22 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
       setBusDetails((prev) => ({...prev, [name]: value}));
     };
 
+    // Toggle every feature on/off
+    const areAllFeaturesEnabled = Object.values(
+      busDetails.features || {}
+    ).every(Boolean);
+
+    const handleSelectAllChange = () => {
+      setBusDetails((prev) => {
+        const features = prev.features || {};
+        // build a new features object preserving the exact feature keys expected by BusDetails
+        const newFeatures = Object.fromEntries(
+          Object.keys(features).map((key) => [key, !areAllFeaturesEnabled])
+        ) as BusDetails["features"];
+        return {...prev, features: newFeatures};
+      });
+    };
+
     // handle checkbox
     const handleFeatureChange = (feature: string) => {
       setBusDetails((prev) => ({
@@ -97,12 +113,6 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
           formData.append("images", file);
         });
 
-        // const response = await api.post("/mybus/add-new-bus", formData, {
-        //   headers: { "Content-Type": "multipart/form-data" },
-        // });
-        // toast.success(response.data.message)
-        // return response.data.data?._id || true
-
         let response;
 
         // ✅ Check if busId exists -> update, else create
@@ -131,38 +141,28 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
       createBus: saveBus,
     }));
 
-    // useEffect(() => {
-    //   const fetchBusDetails = async () => {
-    //     if (busId) {
-    //       const response = await api.get(`/mybus/get-bus/${busId}`);
-    //       console.log("respons from the get bus details..............", response);
-    //       setBusDetails(response.data.data);
-    //     }
-    //   };
-    //   fetchBusDetails();
-    // }, [busId]);
-
     useEffect(() => {
-  const fetchBusDetails = async () => {
-    if (busId) {
-      const response = await api.get(`/mybus/get-bus/${busId}`);
-      console.log("response from get bus details..............", response);
+      const fetchBusDetails = async () => {
+        if (busId) {
+          const response = await api.get(`/mybus/get-bus/${busId}`);
+          console.log("response from get bus details..............", response);
 
-      const busData = response.data.data;
-      setBusDetails(busData);
+          const busData = response.data.data;
+          setBusDetails(busData);
 
-      // ✅ If busLayout already loaded, find and set the layout
-      if (busLayout.length > 0) {
-        const selected = busLayout.find(
-          (layout) => layout.name === busData.layoutName || layout._id === busData.layoutId
-        );
-        if (selected) setSelectLayout(selected);
-      }
-    }
-  };
-  fetchBusDetails();
-}, [busId, busLayout]);
-
+          // ✅ If busLayout already loaded, find and set the layout
+          if (busLayout.length > 0) {
+            const selected = busLayout.find(
+              (layout) =>
+                layout.name === busData.layoutName ||
+                layout._id === busData.layoutId
+            );
+            if (selected) setSelectLayout(selected);
+          }
+        }
+      };
+      fetchBusDetails();
+    }, [busId, busLayout]);
 
     const handleLayoutSelect = (id: string) => {
       const layout = busLayout.find((layout) => layout._id === id);
@@ -266,6 +266,17 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
           <h3>Features</h3>
 
           {/* Selected Feature Icons Container */}
+
+          <label className="flex items-center gap-2 text-sm text-gray-600 font-medium">
+            <input
+              type="checkbox"
+              checked={areAllFeaturesEnabled}
+              onChange={handleSelectAllChange}
+              className="h-4 w-4 border rounded-sm"
+            />
+            Select All
+          </label>
+
           {Object.entries(busDetails.features).some(([_, value]) => value) && (
             <div className="">
               <h3 className="text-gray-700 text-sm font-semibold mb-2">

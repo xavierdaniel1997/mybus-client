@@ -8,11 +8,13 @@ import {IoIosArrowBack, IoIosArrowForward} from "react-icons/io";
 interface MiniCalendarProps {
   selectedDates: Date[];
   onDateSelect: (date: Date) => void;
+  disabled?: boolean;
 }
 
 export default function MiniCalendar({
   selectedDates,
   onDateSelect,
+  disabled = false,
 }: MiniCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
 
@@ -31,7 +33,10 @@ export default function MiniCalendar({
   const isSelected = (date: dayjs.Dayjs) =>
     selectedDates.some((d) => dayjs(d).isSame(date, "day"));
 
-  const handleDateClick = (date: dayjs.Dayjs) => onDateSelect(date.toDate());
+  // const handleDateClick = (date: dayjs.Dayjs) => onDateSelect(date.toDate());
+  const handleDateClick = (date: dayjs.Dayjs) => {
+    if (!disabled) onDateSelect(date.toDate());
+  };
 
   return (
     <div>

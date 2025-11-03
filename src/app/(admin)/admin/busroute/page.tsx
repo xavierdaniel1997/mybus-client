@@ -89,6 +89,7 @@ export default function BusRoute() {
       }
     } else if (currentStep === 2) {
       const tripId = await tripDetailsRef.current?.createTrip();
+      console.log("checking the tripId form the main page", tripId)
       if (tripId) {
         console.log("Trip created with ID:", tripId);
         setTripId(tripId)
