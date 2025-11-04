@@ -2,6 +2,7 @@ import React from "react";
 import {
   Controller,
   Control,
+  useWatch,
   UseFieldArrayRemove,
   UseFieldArrayAppend,
 } from "react-hook-form";
@@ -21,6 +22,15 @@ export default function TripForm({
   appendSeat,
   removeSeat,
 }: TripFormProps) {
+
+
+const watchedFrequency = useWatch({ control, name: "frequency" }) as
+  | "daily"
+  | "weekdays"
+  | "custom"
+  | undefined;
+
+
   return (
     <div className="space-y-4">
 
@@ -70,6 +80,32 @@ export default function TripForm({
           )}
         />
       </div>
+
+      {watchedFrequency === "custom" && (
+  <div className="flex flex-col">
+    <label className="text-sm text-gray-600">
+      Custom Interval (days)
+    </label>
+    <Controller
+      name="customInterval"
+      control={control}
+      defaultValue={0}
+      render={({ field }) => (
+        <input
+          {...field}
+          type="number"
+          min={0}
+          placeholder="e.g. 2 (every 2 days). 0 = manual select"
+          className="border rounded-sm py-1.5 px-1"
+        />
+      )}
+    />
+    <p className="text-xs text-gray-500 mt-1">
+      Enter number of days between trips. Set to 0 to pick dates manually.
+    </p>
+  </div>
+)}
+
 
       {/* Time */}
       <div className="flex items-center gap-3">

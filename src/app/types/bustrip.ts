@@ -12,6 +12,7 @@ export interface FormDataTrip {
   departureTime: string;
   arrivalTime: string;
   basePrice: number;
+  customInterval: number;
   startDate: string;
   endDate?: string;
   active: boolean;

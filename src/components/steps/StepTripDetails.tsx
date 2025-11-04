@@ -40,6 +40,7 @@ const StepTripScheduler = forwardRef<
       departureTime: "",
       arrivalTime: "",
       basePrice: 0,
+      customInterval: 0,
       startDate: "",
       endDate: "",
       active: true,
@@ -91,49 +92,37 @@ const StepTripScheduler = forwardRef<
     }
   }, [routeDetail, reset, busId, routeId]);
 
-  // 📅 Handle date selection for mini calendar
-  const handleDateSelect = (date: Date) => {
-  if (watchFrequency !== "custom") return; // disable manual clicks for daily/weekdays
+ const handleDateSelect = (date: Date) => {
+  // manual selection allowed only when custom frequency AND no interval
+  if (!(watchFrequency === "custom" && (!watchCustomInterval || Number(watchCustomInterval) === 0))) {
+    return;
+  }
 
   setScheduledDates((prev) => {
     const exists = prev.some((d) => dayjs(d).isSame(date, "day"));
-    return exists
-      ? prev.filter((d) => !dayjs(d).isSame(date, "day"))
-      : [...prev, date];
+    return exists ? prev.filter((d) => !dayjs(d).isSame(date, "day")) : [...prev, date];
   });
 };
+
 
 
   // 🗓️ Auto-generate full date range
   const watchStart = watch("startDate");
   const watchEnd = watch("endDate");
-    const watchFrequency = watch("frequency");
+const watchFrequency = watch("frequency");
+const watchCustomInterval = watch("customInterval"); // number | undefined
 
-  // useEffect(() => {
-  //   if (watchStart && watchEnd) {
-  //     const start = dayjs(watchStart);
-  //     const end = dayjs(watchEnd);
-  //     if (!start.isValid() || !end.isValid()) return;
-
-  //     const range: Date[] = [];
-  //     let d = start;
-  //     while (d.isBefore(end) || d.isSame(end, "day")) {
-  //       range.push(d.toDate());
-  //       d = d.add(1, "day");
-  //     }
-  //     setScheduledDates(range);
-  //   }
-  // }, [watchStart, watchEnd]);
+ 
 
 
-  useEffect(() => {
+useEffect(() => {
   if (!watchStart || !watchEnd) return;
   const start = dayjs(watchStart);
   const end = dayjs(watchEnd);
   if (!start.isValid() || !end.isValid()) return;
 
+  // DAILY: all days
   if (watchFrequency === "daily") {
-    // all days in range
     const range: Date[] = [];
     let d = start;
     while (d.isBefore(end) || d.isSame(end, "day")) {
@@ -141,24 +130,48 @@ const StepTripScheduler = forwardRef<
       d = d.add(1, "day");
     }
     setScheduledDates(range);
-  } 
-  else if (watchFrequency === "weekdays") {
-    // only Mon–Fri
+    return;
+  }
+
+  // WEEKDAYS: Mon - Fri
+  if (watchFrequency === "weekdays") {
     const range: Date[] = [];
     let d = start;
     while (d.isBefore(end) || d.isSame(end, "day")) {
-      if (d.day() >= 1 && d.day() <= 5) {
-        range.push(d.toDate());
-      }
+      if (d.day() >= 1 && d.day() <= 5) range.push(d.toDate());
       d = d.add(1, "day");
     }
     setScheduledDates(range);
+    return;
   }
-  else if (watchFrequency === "custom") {
-    // don't auto-generate anything — user will pick dates manually
-    setScheduledDates((prev) => prev); // keep user’s manual selection
+
+  // CUSTOM:
+  // - if customInterval > 0 -> auto-generate every N days
+  // - if customInterval is 0 / undefined -> keep manual selection (do not overwrite)
+  if (watchFrequency === "custom") {
+    const interval = Number(watchCustomInterval) || 0;
+    if (interval > 0) {
+      const range: Date[] = [];
+      let d = start;
+      while (d.isBefore(end) || d.isSame(end, "day")) {
+        range.push(d.toDate());
+        d = d.add(interval, "day");
+      }
+      setScheduledDates(range);
+    } else {
+      // manual mode: do nothing (keep existing scheduledDates from clicks)
+      // but if start/end changed and selectedDates outside the new range should be filtered:
+      setScheduledDates((prev) =>
+        prev.filter((dt) => {
+          const dd = dayjs(dt);
+          return (dd.isAfter(start) || dd.isSame(start, "day")) &&
+                 (dd.isBefore(end) || dd.isSame(end, "day"));
+        })
+      );
+    }
   }
-}, [watchStart, watchEnd, watchFrequency]);
+}, [watchStart, watchEnd, watchFrequency, watchCustomInterval]);
+
 
 
   // ⚙️ Define the save function (used by parent)
@@ -205,7 +218,8 @@ const StepTripScheduler = forwardRef<
         <MiniCalendar
           selectedDates={scheduledDates}
           onDateSelect={handleDateSelect}
-          disabled={watchFrequency !== "custom"}
+          // disabled={watchFrequency !== "custom"}
+            disabled={!(watchFrequency === "custom" && (!watchCustomInterval || Number(watchCustomInterval) === 0))}
         />
         <div className="flex justify-end mt-9">
                     {isLoading && (
