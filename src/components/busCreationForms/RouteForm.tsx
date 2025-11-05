@@ -65,7 +65,7 @@ export default function RouteForm({
         >
           <input
             ref={sourceRef}
-            className="border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
+            className="border w-sm rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
             placeholder="Search source"
           />
         </Autocomplete>
@@ -114,7 +114,7 @@ export default function RouteForm({
         >
           <input
             ref={destinationRef}
-            className="border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
+            className="border w-sm rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
             placeholder="Search destination"
           />
         </Autocomplete>
@@ -162,7 +162,7 @@ export default function RouteForm({
               }}
             >
               <input
-                className="border rounded-sm py-1.5 px-1"
+                className="border w-sm rounded-sm py-1.5 px-1"
                 placeholder={`Boarding point ${index + 1}`}
               />
             </Autocomplete>
@@ -223,7 +223,7 @@ export default function RouteForm({
               }}
             >
               <input
-                className="border w-full rounded-sm py-1.5 px-1"
+                className="border w-sm rounded-sm py-1.5 px-1"
                 placeholder={`Dropping point ${index + 1}`}
               />
             </Autocomplete>
@@ -284,7 +284,7 @@ export default function RouteForm({
               }}
             >
               <input
-                className="border w-full rounded-sm py-1.5 px-1"
+                className="border w-sm rounded-sm py-1.5 px-1"
                 placeholder={`Stop ${index + 1}`}
               />
             </Autocomplete>

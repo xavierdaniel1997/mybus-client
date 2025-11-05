@@ -25,13 +25,13 @@ interface StepTripDetailsProps {
   busId?: string | null;
   routeId?: string | null;
   routeDetail?: RouteDetailsRes | null;
-  tripId?: string | null;
+  scheduleId?: string | null;
 }
 
 const StepTripScheduler = forwardRef<
   StepTripSchedulerRef,
   StepTripDetailsProps
->(({busId, routeId, routeDetail, tripId}, ref) => {
+>(({busId, routeId, routeDetail, scheduleId}, ref) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const {control, handleSubmit, watch, reset} = useForm<FormDataTrip>({
     defaultValues: {
@@ -61,9 +61,9 @@ const StepTripScheduler = forwardRef<
 
   useEffect(() => {
     const fetchTripDetails = async () => {
-      if (!tripId) return;
+      if (!scheduleId) return;
       try {
-        const response = await api.get(`/mytrips/scheduled-trips/${tripId}`);
+        const response = await api.get(`/mytrips/scheduled-trips/${scheduleId}`);
         if (response.status === 200 && response.data.data) {
           reset(response.data.data);
         }
@@ -73,7 +73,7 @@ const StepTripScheduler = forwardRef<
     };
 
     fetchTripDetails();
-  }, [tripId, reset]);
+  }, [scheduleId, reset]);
 
   useEffect(() => {
     if (routeDetail) {
@@ -191,8 +191,8 @@ useEffect(() => {
       };
 
       try {
-        if(tripId){
-          const res = await api.post(`/mytrips/update-trip-schedule/${tripId}`, payload);
+        if(scheduleId){
+          const res = await api.put(`/mytrips/update-trip-schedule/${scheduleId}`, payload);
           if (res.status === 200 && res.data?.schedule?._id) {
             return res.data.schedule._id;
           }
@@ -211,40 +211,58 @@ useEffect(() => {
   }));
 
   return (
-    <div className="p-6 flex justify-between flex-row gap-16">
-      <div className="flex-2 w-full">
-        <form onSubmit={handleSubmit(() => {})} className="space-y-5">
-          <TripForm
-            control={control}
-            seatFieldsCount={fields.length}
-            appendSeat={append}
-            removeSeat={remove}
-          />
-        </form>
-      </div>
+   <div className="bg-gray-100/90 rounded-md px-8 py-5 flex justify-between gap-10">
+  {/* FORM SECTION — LARGE */}
+  <div className="flex-[3] min-w-0">
+    <form onSubmit={handleSubmit(() => {})} className="space-y-5">
+      <TripForm
+        control={control}
+        seatFieldsCount={fields.length}
+        appendSeat={append}
+        removeSeat={remove}
+      />
+    </form>
+  </div>
 
-      <div className="flex-1">
-        <MiniCalendar
-          selectedDates={scheduledDates}
-          onDateSelect={handleDateSelect}
-          // disabled={watchFrequency !== "custom"}
-            disabled={!(watchFrequency === "custom" && (!watchCustomInterval || Number(watchCustomInterval) === 0))}
-        />
-        <div className="flex justify-end mt-9">
-                    {isLoading && (
-                      <button
-                        className="bg-blue-600 flex items-center justify-center gap-2 px-4 py-1.5 rounded-md text-gray-50 min-w-[120px] transition hover:bg-blue-700 disabled:opacity-70"
-                        disabled={isLoading}
-                      >
-                        <div className="flex items-center gap-2">
-                          <FaBus className="text-white text-xl animate-busRun" />
-                          <span>Uploading...</span>
-                        </div>
-                      </button>
-                    )} 
-                  </div>
-      </div>
+  {/* CALENDAR SECTION — MEDIUM */}
+  <div className="flex-[1.5] min-w-[300px]">
+    <MiniCalendar
+      selectedDates={scheduledDates}
+      onDateSelect={handleDateSelect}
+      disabled={
+        !(
+          watchFrequency === "custom" &&
+          (!watchCustomInterval || Number(watchCustomInterval) === 0)
+        )
+      }
+    />
+    
+  </div>
+
+  {/* DESCRIPTION SECTION — SMALL */}
+  <div className="flex-[1] flex flex-col justify-between text-sm text-gray-600">
+    <p>
+      <strong>Tip:</strong> Use the custom range mode if your schedule doesn’t
+      follow daily or weekday patterns. You can manually select individual
+      dates on the calendar once the start and end dates are chosen.
+    </p>
+    <div className="flex justify-end mt-9">
+      {isLoading && (
+        <button
+          className="bg-blue-600 flex items-center justify-center gap-2 px-4 py-1.5 rounded-md text-gray-50 min-w-[120px] transition hover:bg-blue-700 disabled:opacity-70"
+          disabled={isLoading}
+        >
+          <div className="flex items-center gap-2">
+            <FaBus className="text-white text-xl animate-busRun" />
+            <span>Uploading...</span>
+          </div>
+        </button>
+      )}
     </div>
+  </div>
+  
+</div>
+
   );
 });
 

@@ -287,7 +287,7 @@ const StepRouteDetails = forwardRef<StepRouteDetailsRef, StepRouteDetailsProps>(
           {loadingCreate && <div className="flex justify-end mt-4">
             <button
               type="button"
-              className="px-4 py-1 bg-blue-600 text-white rounded-md"
+              className="bg-blue-600 flex items-center justify-center gap-2 px-4 py-1.5 rounded-md text-gray-50 min-w-[120px] transition hover:bg-blue-700 disabled:opacity-70"
               onClick={async () => {
                 const id = await (
                   ref as React.RefObject<StepRouteDetailsRef>

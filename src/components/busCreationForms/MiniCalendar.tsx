@@ -40,10 +40,10 @@ export default function MiniCalendar({
 
   return (
     <div>
-      <h3 className="font-semibold text-sm mb-2">
+      <h3 className="font-semibold text mb-2">
         Scheduled Days
       </h3>
-      <p className="w-full text-xs text-gray-500 mb-4">Select dates from the calendar</p>
+      <p className="w-full text-sm text-gray-500 mb-4">Select dates from the calendar</p>
       <div className="w-[400px] h-[420px] border rounded-md p-3 shadow-sm">
         {/* Header */}
         <div className="flex justify-between items-center mb-3">

@@ -65,49 +65,7 @@ const watchedFrequency = useWatch({ control, name: "frequency" }) as
         />
       </div>
 
-      {/* Frequency */}
-      <div className="flex flex-col">
-        <label className="text-sm text-gray-600">Trip Frequency</label>
-        <Controller
-          name="frequency"
-          control={control}
-          render={({ field }) => (
-            <select {...field} className="border rounded-sm py-1.5 px-1">
-              <option value="daily">Daily</option>
-              <option value="weekdays">Weekdays</option>
-              <option value="custom">Custom</option>
-            </select>
-          )}
-        />
-      </div>
-
-      {watchedFrequency === "custom" && (
-  <div className="flex flex-col">
-    <label className="text-sm text-gray-600">
-      Custom Interval (days)
-    </label>
-    <Controller
-      name="customInterval"
-      control={control}
-      defaultValue={0}
-      render={({ field }) => (
-        <input
-          {...field}
-          type="number"
-          min={0}
-          placeholder="e.g. 2 (every 2 days). 0 = manual select"
-          className="border rounded-sm py-1.5 px-1"
-        />
-      )}
-    />
-    <p className="text-xs text-gray-500 mt-1">
-      Enter number of days between trips. Set to 0 to pick dates manually.
-    </p>
-  </div>
-)}
-
-
-      {/* Time */}
+        {/* Time */}
       <div className="flex items-center gap-3">
         <div className="flex-1">
           <label className="text-sm text-gray-600">Departure Time</label>
@@ -172,6 +130,50 @@ const watchedFrequency = useWatch({ control, name: "frequency" }) as
           />
         </div>
       </div>
+
+      {/* Frequency */}
+      <div className="flex flex-col">
+        <label className="text-sm text-gray-600">Trip Frequency</label>
+        <Controller
+          name="frequency"
+          control={control}
+          render={({ field }) => (
+            <select {...field} className="border rounded-sm py-1.5 px-1">
+              <option value="daily">Daily</option>
+              <option value="weekdays">Weekdays</option>
+              <option value="custom">Custom</option>
+            </select>
+          )}
+        />
+      </div>
+
+      {watchedFrequency === "custom" && (
+  <div className="flex flex-col">
+    <label className="text-sm text-gray-600">
+      Custom Interval (days)
+    </label>
+    <Controller
+      name="customInterval"
+      control={control}
+      defaultValue={0}
+      render={({ field }) => (
+        <input
+          {...field}
+          type="number"
+          min={0}
+          placeholder="e.g. 2 (every 2 days). 0 = manual select"
+          className="border rounded-sm py-1.5 px-1"
+        />
+      )}
+    />
+    <p className="text-xs text-gray-500 mt-1">
+      Enter number of days between trips. Set to 0 to pick dates manually.
+    </p>
+  </div>
+)}
+
+
+    
 
       {/* Base Price */}
       <div className="flex flex-col">

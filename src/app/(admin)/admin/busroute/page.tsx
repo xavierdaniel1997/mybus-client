@@ -20,7 +20,7 @@ export default function BusRoute() {
   const routeDetailsRef = useRef<StepRouteDetailsRef>(null);
   const tripDetailsRef = useRef<StepTripSchedulerRef>(null);
   const [routeId, setRouteId] = useState<string | null>(null);
-  const [tripId, setTripId] = useState<string | null>(null);
+  const [scheduleId, setScheduleId] = useState<string | null>(null);
   const [routeDetail, setRouteDetail] = useState(null);
 
   // ✅ Persistent bus data stored here
@@ -66,10 +66,13 @@ export default function BusRoute() {
       routeId={routeId}
       routeDetail={routeDetail || null}
       busId={busId}
-      tripId={tripId || null}
+      scheduleId={scheduleId || null}
     />,
     // <StepSeatAllocation key="seat" />,
-    <StepConfirmation key="confirm" />,
+    <StepConfirmation
+     key="confirm" 
+      scheduleId={scheduleId || null}
+     />,
   ];
 
   const handleNext = async () => {
@@ -88,11 +91,10 @@ export default function BusRoute() {
         console.warn("Route creation failed or cancelled; staying on step.");
       }
     } else if (currentStep === 2) {
-      const tripId = await tripDetailsRef.current?.createTrip();
-      console.log("checking the tripId form the main page", tripId)
-      if (tripId) {
-        console.log("Trip created with ID:", tripId);
-        setTripId(tripId)
+      const scheduleId = await tripDetailsRef.current?.createTrip();
+      if (scheduleId) {
+        console.log("Trip created with ID:", scheduleId);
+        setScheduleId(scheduleId)
         setCurrentStep((prev) => prev + 1);
       } else {
         console.warn("Trip creation failed; staying on step.");
@@ -124,9 +126,6 @@ export default function BusRoute() {
         <h1 className="text-xl font-semibold text-gray-700">
           Add New Bus Route
         </h1>
-        <button className="flex items-center bg-blue-600 text-gray-50 px-4 py-1.5 rounded-md cursor-pointer gap-2">
-          <FaRoute /> Create Route
-        </button>
       </div>
 
       <div className="w-full mt-4">
@@ -160,9 +159,9 @@ export default function BusRoute() {
             {busId ? "Update & Next" : "Save & Next"}
           </button>
         ) : (
-          <button className="px-6 py-1.5 bg-green-600 text-white rounded-md">
-            Confirm
-          </button>
+           <button className="flex items-center bg-blue-600 text-gray-50 px-4 py-1.5 rounded-md cursor-pointer gap-2">
+          <FaRoute /> Create Route
+        </button>
         )}
       </div>
     </div>
