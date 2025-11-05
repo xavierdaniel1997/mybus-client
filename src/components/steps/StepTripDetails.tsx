@@ -15,6 +15,7 @@ import {RouteDetailsRes} from "@/app/types/busroute";
 import {api} from "@/lib/api";
 import {handleApiError} from "@/lib/utils/handleApiError";
 import { FaBus } from "react-icons/fa6";
+import { toast } from "sonner";
 
 export interface StepTripSchedulerRef {
   createTrip: () => Promise<string | null>;
@@ -177,8 +178,9 @@ useEffect(() => {
   // ⚙️ Define the save function (used by parent)
   useImperativeHandle(ref, () => ({
     async createTrip() {
+      
       setIsLoading(true);
-      const data = watch(); // get current form values
+      const data = watch(); 
       const payload = {
         ...data,
         bus: busId,
@@ -189,9 +191,16 @@ useEffect(() => {
       };
 
       try {
-        const res = await api.post("/mytrips/schedule-trip", payload);
-        if (res.status === 200 && res.data?.schedule?._id) {
-          return res.data.schedule._id;
+        if(tripId){
+          const res = await api.post(`/mytrips/update-trip-schedule/${tripId}`, payload);
+          if (res.status === 200 && res.data?.schedule?._id) {
+            return res.data.schedule._id;
+          }
+        }else{
+          const res = await api.post("/mytrips/schedule-trip", payload);
+          if (res.status === 200 && res.data?.schedule?._id) {
+            return res.data.schedule._id;
+          }
         }
       } catch (error) {
         setIsLoading(false);
