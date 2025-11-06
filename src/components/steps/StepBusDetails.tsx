@@ -20,6 +20,7 @@ import {
 import {GiPillow} from "react-icons/gi";
 import {toast} from "sonner";
 import {BusDetails, StepBusDetailsRef} from "@/app/types/addBusType";
+import { featureIcons } from "../bus/FeatureIcons";
 
 interface StepBusDetailsProps {
   busDetails: BusDetails;
@@ -35,16 +36,16 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
     const [busImages, setBusImages] = useState<File[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const featureIcons: Record<string, JSX.Element> = {
-      wifi: <FaWifi className="text-blue-500 text-xl" />,
-      chargingPoint: <FaChargingStation className="text-yellow-500 text-xl" />,
-      waterBottle: <FaBottleWater className="text-blue-400 text-xl" />,
-      blankets: <FaBed className="text-purple-500 text-xl" />,
-      snacks: <FaCookieBite className="text-orange-500 text-xl" />,
-      readingLight: <FaLightbulb className="text-amber-400 text-xl" />,
-      cctv: <FaVideo className="text-red-500 text-xl" />,
-      pillow: <GiPillow className="text-pink-400 text-xl" />,
-    };
+    // const featureIcons: Record<string, JSX.Element> = {
+    //   wifi: <FaWifi className="text-blue-500 text-xl" />,
+    //   chargingPoint: <FaChargingStation className="text-yellow-500 text-xl" />,
+    //   waterBottle: <FaBottleWater className="text-blue-400 text-xl" />,
+    //   blankets: <FaBed className="text-purple-500 text-xl" />,
+    //   snacks: <FaCookieBite className="text-orange-500 text-xl" />,
+    //   readingLight: <FaLightbulb className="text-amber-400 text-xl" />,
+    //   cctv: <FaVideo className="text-red-500 text-xl" />,
+    //   pillow: <GiPillow className="text-pink-400 text-xl" />,
+    // };
 
     const getSeatingLayout = async () => {
       try {

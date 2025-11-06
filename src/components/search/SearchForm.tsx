@@ -20,7 +20,7 @@ export default function SearchForm() {
   ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mx-auto w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] max-w-5xl">
+    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mx-auto w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] max-w-6xl">
       {/* ===== Tabs ===== */}
       <div className="flex justify-around sm:justify-start gap-4 sm:gap-8 border-b overflow-x-auto">
         {tabs.map((tab) => (

@@ -1,0 +1,46 @@
+{
+  "coupons": [
+    {
+      "title": "Save up to Rs 250 on bus tickets",
+      "description": "",
+      "validTill": "30 Nov",
+      "code": "FIRST",
+      "icon": "bus"
+    },
+    {
+      "title": "Save up to Rs 300 on Karnataka, Tamil Nadu, Kerala routes",
+      "description": "",
+      "validTill": "30 Nov",
+      "code": "CASH300",
+      "icon": "wallet"
+    },
+    {
+      "title": "Save up to Rs 500 with Axis Bank Credit Cards",
+      "description": "",
+      "validTill": "15 Dec",
+      "code": "AXIS500",
+      "icon": "credit-card"
+    },
+    {
+      "title": "Flat Rs 200 off on your first bus booking",
+      "description": "",
+      "validTill": "31 Dec",
+      "code": "RED200",
+      "icon": "bus"
+    },
+    {
+      "title": "Save 10% on round-trip bookings",
+      "description": "",
+      "validTill": "20 Dec",
+      "code": "ROUND10",
+      "icon": "wallet"
+    },
+    {
+      "title": "Up to Rs 400 off with HDFC Bank Cards",
+      "description": "",
+      "validTill": "25 Dec",
+      "code": "HDFC400",
+      "icon": "credit-card"
+    }
+  ]
+}

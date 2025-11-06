@@ -24,3 +24,5 @@ export interface BusTypeLayoutResponse {
   message: string;
   bustypeLayout: BusLayout[];
 }
+
+

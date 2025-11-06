@@ -89,7 +89,7 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
                   <button className="cursor-pointer" onClick={handleToggleDropDown}>Hi, {user?.firstName}</button>
                   <FaAngleDown />
                 </div>
-                {openDropDown && <div className="absolute top-20 right-36 text-gray-700 bg-gray-100 py-2 px-4">
+                {openDropDown && <div className="absolute top-20  text-gray-700 bg-gray-100 py-2 px-4">
                   <ul>
                     <button className="flex items-center gap-3 p-2 cursor-pointer"
                     onClick={handleLogout}

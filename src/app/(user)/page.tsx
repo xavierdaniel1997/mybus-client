@@ -1,47 +1,72 @@
-import Image from "next/image";
-// import coverbanner from '../../public/coverbanner.png'
-import coverbanner from '../../../public/coverbanner.png'
-import SearchForm from "../../components/search/SearchForm";
+"use client";
 
+import Image from "next/image";
+import coverbanner from "../../../public/coverbanner.png";
+import SearchForm from "../../components/search/SearchForm";
+import CouponCard from "@/components/common/CouponCard";
+import couponsData from "../../data/couponsData.json";
+import { FaBusAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { GiWallet } from "react-icons/gi";
+import { MdCreditCard } from "react-icons/md";
+import { useState } from "react";
+import { JSX } from "react";
+import { Coupon } from "../types/coupon";
+import CouponList from "@/components/common/CouponList";
+import StatsBanner from "@/components/common/StatsBanner";
+import LocationList from "@/components/common/LocationList";
+
+const iconMap: Record<string, JSX.Element> = {
+  bus: <FaBusAlt />,
+  wallet: <GiWallet />,
+  "credit-card": <MdCreditCard />,
+};
 
 export default function Home() {
+  const coupons: Coupon[] = couponsData.coupons;
+
+  // show 4 cards per page
+  const [startIndex, setStartIndex] = useState(0);
+  const visibleCount = 4;
+
+  const handleScroll = (direction: "left" | "right") => {
+    const newIndex =
+      direction === "left"
+        ? Math.max(0, startIndex - visibleCount)
+        : Math.min(coupons.length - visibleCount, startIndex + visibleCount);
+
+    setStartIndex(newIndex);
+  };
+
+  // slice coupons to display only visible ones
+  const visibleCoupons = coupons.slice(startIndex, startIndex + visibleCount);
+
   return (
     <section className="relative w-full bg-gray-100">
       {/* ===== Banner Section ===== */}
-      <div className="relative w-full h-[200px] sm:h-[280px] md:h-[300px] lg:h-[350px] overflow-hidden">
+      <div className="relative w-full h-[200px] sm:h-[280px] md:h-[350px] lg:h-[380px] overflow-hidden">
         <Image
-          src={coverbanner} 
+          src={coverbanner}
           alt="Bus Banner"
           fill
           priority
           className="object-cover"
         />
-        {/* Overlay Gradient */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-black/60"></div>
-
-        {/* Text Overlay */}
-        {/* <div className="absolute inset-0 flex flex-col justify-center items-center px-6 sm:px-10 lg:px-20 bottom-10">
-          <h1 className="text-gray-200/80 font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl max-w-2xl leading-tight drop-shadow-lg text-center">
-            MyBus&apos;s No.1 online bus ticket booking site
-          </h1>
-        </div> */}
       </div>
 
-      {/* ===== Booking Card (Overlapping) ===== */}
+      {/* ===== Booking Card ===== */}
       <div className="relative flex justify-center -mt-10 sm:-mt-14 md:-mt-20 z-20">
-        <SearchForm/>  
+        <SearchForm />
       </div>
 
-      {/* Spacer */}
-      {/* <div className="h-16 md:h-20"></div> */}
-      <div className="p-10 bg-gray-100 text-gray-600">
-        <h1>Bus Booking Discount Offers</h1>
-        <div>
-          <h1 className="text-2xl">Bus 110</h1>
-          <h1 className="text-2xl">Bus 1</h1> 
-          <h1 className="text-2xl">Bus 1</h1>
-          <h1 className="text-2xl">Bus 1</h1>
-        </div>
+      {/* ===== Coupon Section ===== */}
+      <CouponList/>
+      <div className="bg-gray-100">
+      <StatsBanner/>
+      </div>
+
+      <div>
+        <LocationList/>
       </div>
     </section>
   );

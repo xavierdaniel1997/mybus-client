@@ -130,6 +130,16 @@
   100% { transform: translateX(0); }
 }
 
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE & Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+
 .animate-busRun {
   animation: busRun 0.5s linear infinite;
 }

@@ -76,8 +76,9 @@ export default function ImageUploader({
       <div className="grid grid-cols-3 gap-3 mt-4">
         {existingImages.map((url, idx) => (
           <div key={`existing-${idx}`} className="relative group border rounded-md overflow-hidden">
-            <Image width={128}
-              height={128} src={url} alt={`existing-${idx}`} className="w-full h-32 object-cover" />
+            <Image 
+            width={0}
+              height={0} src={url} alt={`existing-${idx}`} className="object-cover  w-200 h-40" />
             <button
               type="button"
               onClick={() => removeExistingImage(idx)}
@@ -91,8 +92,8 @@ export default function ImageUploader({
         {objectUrls.map((url, index) => (
           <div key={`new-${index}`} className="relative group border rounded-md overflow-hidden">
             <Image
-              width={128}
-              height={128} src={url} alt={`preview-${index}`} className="w-full h-32 object-cover" />
+              width={0}
+              height={0} src={url} alt={`preview-${index}`} className="object-cover w-200 h-40" />
             <button
               type="button"
               onClick={() => removeNewFile(index)}

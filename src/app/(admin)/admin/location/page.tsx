@@ -111,7 +111,6 @@ setTotalPages(response.data.pagination.totalPages);
     ),
   }));
 
-  console.log("refined data of location",  locationDetails)
 
 
 

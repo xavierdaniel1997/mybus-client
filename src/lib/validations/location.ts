@@ -16,14 +16,14 @@ export const locationSchema = z.object({
   stationCode: z
     .string()
     .min(2, "Station code must be at least 2 characters")
-    .max(10, "Station code should not exceed 10 characters"),
+    .max(50, "Station code should not exceed 10 characters"),
   latitude: z
     .string()
-    .refine((val) => /^-?\d+(\.\d+)?$/.test(val), "Enter a valid latitude")
+    .min(2, "Enter a valid latitude")
     .optional(),
   longitude: z
     .string()
-    .refine((val) => /^-?\d+(\.\d+)?$/.test(val), "Enter a valid longitude")
+    .min(2, "Enter a valid longitude")
     .optional(),
   locationImage: z
     .any()

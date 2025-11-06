@@ -5,10 +5,11 @@ import { BsDoorOpen } from "react-icons/bs";
 
 interface SeatGridProps {
   layout: { id: string; type: string }[][];
-  isUpperDeck: boolean
+  isUpperDeck: boolean;
+  price?: number
 }
 
-export default function SeatGrid({ layout, isUpperDeck }: SeatGridProps) {
+export default function SeatGrid({ layout, isUpperDeck, price }: SeatGridProps) {
     // console.log("layout details", layout)
   return (
     <div className="bg-gray-100 p-4 border-2 border-gray-200 rounded-lg shadow-lg relative inline-block">
@@ -37,10 +38,13 @@ export default function SeatGrid({ layout, isUpperDeck }: SeatGridProps) {
               ) : (
                 <div
                   key={seat.id}
-                  className={`${seat.type==="seater" ? "w-8 h-8" : "w-8 h-12"} bg-gray-400 hover:bg-gray-600 text-white text-xs flex justify-center items-center rounded-sm cursor-pointer mb-1`}
+                  className={`${seat.type==="seater" ? "w-8 h-8" : "w-10 h-16"} flex flex-col bg-gray-400 hover:bg-gray-600 text-white text-xs justify-center items-center rounded-sm cursor-pointer mb-1`}
                   
                 >
-                  <p className="text-xs">{seat.id}</p>
+                  <p className="text-[10px]">{seat.id}</p>
+                  {price && (
+        <p className="text-[10px] mt-0.5">₹{price}</p>
+      )}
                 </div>
               )
             )}
