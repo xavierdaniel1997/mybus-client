@@ -4,6 +4,7 @@ import { FaBus, FaCalendarAlt, FaSearch } from "react-icons/fa";
 import { MdSwapVert } from "react-icons/md";
 import '../../app/globals.css'
 import Navbar from "@/components/layouts/Navbar";
+import Footer from "@/components/layouts/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function UserLayout({
       >
         <Navbar/>
          <main className="flex-grow">{children}</main>
+         <Footer/>
       </div>
     // </html>
   );

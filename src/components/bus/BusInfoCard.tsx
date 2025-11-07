@@ -10,7 +10,7 @@ interface BusInfoCardProp{
 
 export default function BusInfoCard({busInfo, scheduleInfo}: BusInfoCardProp){
     return(
-        <div className="flex justify-between gap-10">
+        <div className="flex justify-between gap-16">
                   <div>
                     <p className="mb-3">
                       <strong>Bus Details</strong>
@@ -23,14 +23,14 @@ export default function BusInfoCard({busInfo, scheduleInfo}: BusInfoCardProp){
                       <p><span className="font-semibold">Layout Type : </span>{busInfo?.layoutName}</p>
         
                       {busInfo?.images.map((image) => (
-                        <div key={image}>
+                        <div key={image} className="flex items-center">
                           <Image
                             src={image}
                             width={0}
                             height={0}
                             unoptimized
                             alt="bus images"
-                            className="object-cover rounded-sm w-80 h-50"
+                            className="object-cover rounded-sm w-60 h-50"
                           />
                         </div>
                       ))}

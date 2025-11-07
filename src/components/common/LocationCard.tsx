@@ -1,16 +1,17 @@
 import Image from "next/image";
-import busImage from "../../../public/bannerimage.png"
 
-export default function LocationCard(){
-    return(
-        <div>
-            <Image
-            src={busImage}
-            alt="Locations"
-            width={0}
-            height={0}
-            className="w-80 h-60 object-cover rounded-sm"
-            />
-        </div>
-    )
+export default function LocationCard({locationName, locationImage}: {locationName: string, locationImage: string}) {
+  return (
+    <div className="relative w-60 h-50">
+      <Image
+        src={locationImage}
+        alt={locationName}
+        fill
+        className="object-cover rounded-sm"
+      />
+      <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/80 text-gray-600 font-semibold px-3 py-1 rounded-sm text-sm shadow">
+        {locationName}
+      </p>
+    </div>
+  );
 }

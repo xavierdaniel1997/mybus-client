@@ -14,6 +14,8 @@ import { Coupon } from "../types/coupon";
 import CouponList from "@/components/common/CouponList";
 import StatsBanner from "@/components/common/StatsBanner";
 import LocationList from "@/components/common/LocationList";
+import MyBusFeatures from "@/components/bus/MyBusFeatures";
+import FAQSection from "@/components/common/FAQSection";
 
 const iconMap: Record<string, JSX.Element> = {
   bus: <FaBusAlt />,
@@ -22,24 +24,6 @@ const iconMap: Record<string, JSX.Element> = {
 };
 
 export default function Home() {
-  const coupons: Coupon[] = couponsData.coupons;
-
-  // show 4 cards per page
-  const [startIndex, setStartIndex] = useState(0);
-  const visibleCount = 4;
-
-  const handleScroll = (direction: "left" | "right") => {
-    const newIndex =
-      direction === "left"
-        ? Math.max(0, startIndex - visibleCount)
-        : Math.min(coupons.length - visibleCount, startIndex + visibleCount);
-
-    setStartIndex(newIndex);
-  };
-
-  // slice coupons to display only visible ones
-  const visibleCoupons = coupons.slice(startIndex, startIndex + visibleCount);
-
   return (
     <section className="relative w-full bg-gray-100">
       {/* ===== Banner Section ===== */}
@@ -60,14 +44,15 @@ export default function Home() {
       </div>
 
       {/* ===== Coupon Section ===== */}
-      <CouponList/>
-      <div className="bg-gray-100">
-      <StatsBanner/>
-      </div>
+      <CouponList />
 
-      <div>
-        <LocationList/>
-      </div>
+      <StatsBanner />
+
+      <LocationList />
+
+      <MyBusFeatures />
+
+      <FAQSection />
     </section>
   );
 }

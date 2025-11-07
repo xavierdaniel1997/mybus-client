@@ -3,7 +3,7 @@ import { useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import couponsData from "../../data/couponsData.json"
 import CouponCard from "./CouponCard";
-import { FaBusAlt } from "react-icons/fa";
+import { BiSolidOffer } from "react-icons/bi";
 
 export default function CouponList(){
     const coupons: Coupon[] = couponsData.coupons;
@@ -27,7 +27,8 @@ export default function CouponList(){
         <div className="px-6 sm:px-10 lg:px-96 py-12  text-gray-800">
                 {/* Title + Arrows */}
                 <div className="flex items-center justify-between mb-6">
-                  <h1 className="font-semibold text-xl">
+                  <h1 className="font-semibold text-xl flex items-center gap-2">
+                    <span><BiSolidOffer size={25}/></span>
                     Bus Booking Discount Offers
                   </h1>
                   <div className="flex gap-3">
