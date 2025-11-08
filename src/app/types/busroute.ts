@@ -16,6 +16,7 @@ export interface FormData {
   bus: string;
   source: GeoPoint;
   destination: GeoPoint;
+  routeDescription: string;
   boardingPoints: GeoPoint[];
   droppingPoints: GeoPoint[];
   stops: GeoPoint[];

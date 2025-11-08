@@ -57,6 +57,23 @@ export default function RouteForm({
         />
       </div>
 
+      {/* Route Description */}
+<div className="flex flex-col mb-3">
+  <label className="text-sm text-gray-600">Route Description</label>
+  <Controller
+    name="routeDescription"
+    control={control}
+    render={({ field }) => (
+      <textarea
+        {...field}
+        className="border rounded-sm py-1.5 px-2 focus:ring focus:ring-blue-500 outline-none resize-none h-20"
+        placeholder="Describe this route (e.g. major cities, scenic route, etc.)"
+      />
+    )}
+  />
+</div>
+
+
       {/* Source */}
       <h3 className="text-sm text-gray-600 mb-1">Source</h3>
       <div className="flex items-center gap-5">

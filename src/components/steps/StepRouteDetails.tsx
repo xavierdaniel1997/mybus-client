@@ -30,6 +30,7 @@ const StepRouteDetails = forwardRef<StepRouteDetailsRef, StepRouteDetailsProps>(
         defaultValues: {
           routeName: "",
           bus: busId || "",
+          routeDescription: "",
           distance: 0,
           duration: "",
           source: { name: "", lat: 0, lng: 0 },
