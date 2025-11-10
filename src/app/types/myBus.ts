@@ -59,6 +59,7 @@ export interface IPoint {
 export interface IBusRoute {
   _id: string;
   routeName: string;
+  routeDescription: string;
   source: IPoint;
   destination: IPoint;
   distance: number;

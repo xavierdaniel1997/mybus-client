@@ -6,18 +6,21 @@ interface RouteInfoCardProps{
 }
 
 export default function RouteInfoCard({routeInfo}: RouteInfoCardProps){
+
+    console.log("route details form the route card", routeInfo)
     return(
-        <div className="space-y-3">
+        <div className="flex  gap-5  border-2 border-gray-200 rounded-md px-8 py-5">
+            <div className="space-y-3">
                   <p><strong>Route Details</strong></p>
-                  <p><span className="font-semibold">Route Name : </span>{routeInfo?.routeName}</p>
+                  <p className="font-semibold text-lg">{routeInfo?.routeName}</p>
                   <p><span className="font-semibold">Distance : </span>{routeInfo?.distance}km<span className="font-semibold"> Duration :</span> {routeInfo?.duration}</p>
                   <p><span className="font-semibold">Source : </span>{routeInfo?.source?.name}</p>
                   <p><span className="font-semibold">Destination : </span>{routeInfo?.destination?.name}</p>
-                  <BoardingDroppingPoints
-                  source={routeInfo?.source ||  null}
-                  destination={routeInfo?.destination || null}
-                   boardingPoints={routeInfo?.boardingPoints || []}
-                    droppingPoints={routeInfo?.droppingPoints || []}/>
+                  <h3 className="font-semibold text-lg">Bus route</h3>
+                  <p>
+                    {routeInfo?.routeDescription}
+                  </p>
+                  </div>
                 </div>
     )
 }

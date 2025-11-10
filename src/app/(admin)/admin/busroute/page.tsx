@@ -1,6 +1,7 @@
 "use client";
 
 import {useEffect, useRef, useState} from "react";
+import { useRouter } from "next/navigation";
 import {FaRoute} from "react-icons/fa";
 import BusRouteStepper from "@/components/busroute/BusRouteStepper";
 import StepBusDetails from "@/components/steps/StepBusDetails";
@@ -13,8 +14,10 @@ import {StepBusDetailsRef} from "@/app/types/addBusType";
 import {StepRouteDetailsRef} from "@/app/types/busroute";
 import {api} from "@/lib/api";
 import {handleApiError} from "@/lib/utils/handleApiError";
+import { toast } from "sonner";
 
 export default function BusRoute() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const busDetailsRef = useRef<StepBusDetailsRef>(null);
   const routeDetailsRef = useRef<StepRouteDetailsRef>(null);
@@ -120,6 +123,27 @@ export default function BusRoute() {
     fetchRouteDetails();
   }, [routeId]);
 
+
+  const handleConfirmRoute = async () => {
+  if (!scheduleId) {
+    console.warn("No schedule ID found");
+    return;
+  }
+
+  try {
+    const response = await api.patch(`/mytrips/verify-trips/${scheduleId}`);
+    if (response.status === 200) {
+      toast.success(response.data.message)
+      router.push("/admin");
+    } else {
+      console.error("Verification failed:", response);
+    }
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+
   return (
     <div className="px-5 py-2">
       <div className="flex items-center justify-between">
@@ -159,7 +183,9 @@ export default function BusRoute() {
             {busId ? "Update & Next" : "Save & Next"}
           </button>
         ) : (
-           <button className="flex items-center bg-blue-600 text-gray-50 px-4 py-1.5 rounded-md cursor-pointer gap-2">
+           <button className="flex items-center bg-blue-600 text-gray-50 px-4 py-1.5 rounded-md cursor-pointer gap-2"
+            onClick={handleConfirmRoute}
+            >
           <FaRoute /> Create Route
         </button>
         )}
