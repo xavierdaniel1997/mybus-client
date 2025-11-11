@@ -8,7 +8,6 @@ import { api } from "@/lib/api";
 import { useAuthStore } from "@/app/(store)/useAuthStore";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import AppLoader from "../layouts/AppLoader";
 import { useEffect, useState } from "react";
 
 interface LoginFromProps {
@@ -65,7 +64,7 @@ export default function LoginForm({closeDialog} : LoginFromProps) {
         <AppLoader />
       </div>  
     )} */}
-    {loading && <AppLoader/>}  
+    {/* {loading && <AppLoader/>}   */}
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-center space-y-4">
       <div className="w-full">
         <label className="block text-sm text-gray-700 mb-1">Email</label>

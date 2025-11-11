@@ -51,9 +51,11 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
       }`}
     >
       <div className={`max-w-7xl mx-auto px-6 lg:px-8`}>
+        
         {/* Navbar Container */}
         <div className={`flex justify-between items-center h-16`}>
           {/* Logo Section */}
+          <Link href="/">
           <Image
             src={mybuslogo}
             alt="MyBusGo Logo"
@@ -62,7 +64,7 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
             priority
             className="object-cover object-center"
           />
-
+</Link>
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
             {!isAdmin && (

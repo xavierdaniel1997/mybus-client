@@ -71,14 +71,21 @@ export default function SearchForm({ onSearch }: Props) {
     setSeatType(seat)
   }
 
-    const handleSwap = () => {
-    setFrom(prev => {
-      const old = prev;
-      setFrom(to);
-      setTo(old);
-      return to;
-    });
-  };
+  //   const handleSwap = () => {
+  //   setFrom(prev => {
+  //     const old = prev;
+  //     setFrom(to);
+  //     setTo(old);
+  //     return to;
+  //   });
+  // };
+
+  const handleSwap = () => {
+  const temp = from;
+  setFrom(to);
+  setTo(temp);
+};
+
 
    const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -247,7 +254,7 @@ export default function SearchForm({ onSearch }: Props) {
           </button>
           <button
             type="submit"
-            className="bg-red-500 hover:bg-red-600 text-white rounded-lg px-6 py-2 font-semibold w-full sm:w-auto"
+            className="bg-red-500 hover:bg-red-600 text-white rounded-lg px-6 py-2 font-semibold w-full sm:w-auto " 
           >
             Search
           </button>

@@ -1,7 +1,7 @@
 import {
   FaWifi,
   FaChargingStation,
-  FaBottleWater,
+  FaBottleWater, 
   FaBed,
   FaCookieBite,
   FaLightbulb,
@@ -19,4 +19,16 @@ export const featureIcons: Record<string, JSX.Element> = {
   readingLight: <FaLightbulb className="text-amber-400 text-xl" />,
   cctv: <FaVideo className="text-red-500 text-xl" />,
   pillow: <GiPillow className="text-pink-400 text-xl" />,
+};
+
+
+export const busFeatureIcons: Record<string, JSX.Element> = {
+  wifi: <FaWifi className="text-gray-400 text-xl" />,
+  chargingPoint: <FaChargingStation className="text-gray-400 text-xl" />,
+  waterBottle: <FaBottleWater className="text-gray-400 text-xl" />,
+  blankets: <FaBed className="text-gray-400 text-xl" />,
+  snacks: <FaCookieBite className="text-gray-400 text-xl" />,
+  readingLight: <FaLightbulb className="text-gray-400 text-xl" />,
+  cctv: <FaVideo className="text-gray-400 text-xl" />,
+  pillow: <GiPillow className="text-gray-400 text-xl" />,
 };

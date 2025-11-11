@@ -1,13 +1,16 @@
 "use client";
 
-import { FaBusAlt, FaStar } from "react-icons/fa";
+import { FaBusAlt } from "react-icons/fa";
 import { BsArrowRight } from "react-icons/bs";
+import { BusFeatures } from "@/app/types/addBusType";
+import { busFeatureIcons, featureIcons } from "./FeatureIcons";
+
 
 interface TripCardProps {
   busName: string;
   busType: string;
-  rating: number;
-  totalRatings: number;
+  layoutName: string;
+  information: string;
   departure: string;
   arrival: string;
   duration: string;
@@ -15,14 +18,15 @@ interface TripCardProps {
   singleSeats: number;
   originalPrice: number;
   discountedPrice: number;
+  features?: BusFeatures;
   discountText?: string;
 }
 
 export default function TripCard({
   busName,
   busType,
-  rating,
-  totalRatings,
+  layoutName,
+  information,
   departure,
   arrival,
   duration,
@@ -30,60 +34,74 @@ export default function TripCard({
   singleSeats,
   originalPrice,
   discountedPrice,
-  discountText = "Exclusive ₹100 OFF",
+  features,
+  discountText = "Exclusive ₹150 OFF",
 }: TripCardProps) {
+
+
   return (
-    <div className="relative flex flex-col md:flex-row items-start justify-between gap-3 border border-gray-200 rounded-xl shadow-sm p-4 bg-white hover:shadow-md transition-all">
+    <div className=" border border-gray-200 rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition-all">
+    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
       {/* Left Section */}
-      <div className="flex-1">
-        <div className="flex items-center gap-2">
-          <FaBusAlt className="text-gray-600" />
-          <h2 className="text-lg font-semibold text-gray-800">{busName}</h2>
+      <div className="flex flex-col items-start w-full md:w-1/3">
+        <div className="flex items-center gap-2 text-gray-700">
+          <FaBusAlt className="text-gray-600 text-lg" />
+          <h2 className="text-base font-semibold text-gray-800">{busName}</h2>
         </div>
-        <p className="text-sm text-gray-500 mt-1">{busType}</p>
+        <p className="text-sm text-gray-500 mt-0.5">{busType}</p>
 
-        <div className="flex items-center gap-2 mt-2">
-          <div className="flex items-center bg-green-600 text-white text-sm px-2 py-1 rounded-md">
-            <FaStar className="mr-1 text-xs" />
-            <span>{rating}</span>
-          </div>
-          <span className="text-gray-500 text-sm">{totalRatings}</span>
-        </div>
-
-        <div className="mt-3">
-          <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-md font-medium">
-            Free date change
-          </span>
-        </div>
+        <button className="mt-3 text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-md">
+          {information}
+        </button>
       </div>
 
       {/* Center Section */}
-      <div className="flex flex-col items-center justify-center text-center">
-        <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
+      <div className="flex flex-col items-center text-center w-full md:w-1/3">
+        <div className="flex items-center gap-2 text-base font-semibold text-gray-800">
           <span>{departure}</span>
-          <BsArrowRight className="text-gray-500" />
+          <BsArrowRight className="text-gray-400 text-lg" />
           <span>{arrival}</span>
         </div>
-        <p className="text-sm text-gray-500">
+        <p className="text-xs text-gray-500 mt-1">
           {duration} • {seatsAvailable} Seats{" "}
-          <span className="text-orange-600 font-medium">({singleSeats} Single)</span>
+          <span className="text-gray-700 font-medium">
+            ({singleSeats} Single)
+          </span>
         </p>
       </div>
 
       {/* Right Section */}
-      <div className="flex flex-col items-end justify-between h-full mt-2 md:mt-0">
-        <div className="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-md font-medium">
+      <div className="flex flex-col items-end w-full md:w-1/3">
+        <div className="bg-amber-100 text-amber-800 text-xs font-medium px-3 py-1 rounded-full self-end">
           {discountText}
         </div>
-        <div className="text-right mt-2">
-          <p className="text-sm line-through text-gray-400">₹{originalPrice}</p>
-          <p className="text-lg font-bold text-gray-800">₹{discountedPrice}</p>
-          <p className="text-xs text-gray-500">Onwards</p>
+
+        <div className="flex items-center gap-2 mt-2">
+          <span className="text-sm line-through text-gray-400">
+            ₹{originalPrice}
+          </span>
+          <span className="text-xl font-bold text-gray-800">
+            ₹{discountedPrice}
+          </span>
         </div>
-        <button className="bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-4 py-2 rounded-full mt-3">
-          View seats
-        </button>
+        <p className="text-xs text-gray-500 -mt-1">Onwards</p>
       </div>
     </div>
+    <div className="flex justify-between items-center border-t mt-2 border-dashed">
+      <div className="flex flex-wrap gap-2.5 text-gray-600 text-lg">
+    {features &&
+      Object.entries(features)
+        .filter(([key, value]) => value && busFeatureIcons[key])
+        .map(([key]) => (
+          <span key={key} className="flex items-center text-gray-500">
+            {busFeatureIcons[key]}
+          </span>
+        ))}
+  </div>
+      <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-6 py-2 rounded-full mt-3 transition-colors">
+          View seats
+        </button>
+        </div>
+        </div>
   );
 }
