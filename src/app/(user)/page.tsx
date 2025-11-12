@@ -22,6 +22,7 @@ import TripCard from "@/components/bus/TripCard";
 import { TripData } from "../types/tripSearchResponse";
 import { FaBus } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
+import { useTripStore } from "../(store)/useTripStore";
 
 // const iconMap: Record<string, JSX.Element> = {
 //   bus: <FaBusAlt />,
@@ -31,10 +32,11 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<TripData[]>([]);
+  // const [searchResults, setSearchResults] = useState<TripData[]>([]);
   const [searchError, setSearchError] = useState<string | null>(null);
    const router = useRouter();
   const [isNavigating, setIsNavigating] = useState(false);
+  const { searchResults, setSearchResults } = useTripStore();
 
   const handleViewSeats = async (tripId: string) => {
   setIsNavigating(true);
@@ -44,7 +46,7 @@ export default function Home() {
   const handleSearch = async (params: { from: string; to: string; date: string; seatType: string }) => {
     setIsSearching(true);
     setSearchError(null);
-    setSearchResults([]);
+    // setSearchResults([]);
     try {
       const res = await api.get("mytrips/search-trip", { params });
       setSearchResults(res.data.data);
@@ -105,7 +107,7 @@ export default function Home() {
             <div key={trip._id} onClick={() => handleViewSeats(trip._id)}>
             <TripCard
               busName={trip.bus.name}
-              busType={`${trip.bus.brand}${trip.bus.busType} ${trip.bus.layoutName}`}
+              busType={trip.bus.layoutName}
               layoutName={trip.bus.layoutName}
               information={trip.bus.information}
               departure={trip.departureTime}

@@ -1,5 +1,8 @@
 // types/api/tripSearchResponse.ts
 
+import { RoutePoint } from "./busroute";
+import { IBus } from "./myBus";
+
 export interface SeatPricing {
   seatId: string;
   price: number;
@@ -45,7 +48,9 @@ export interface Route {
   source: Location;
   destination: Location;
   distance: number;
-  duration: string; // e.g., "10 hours 42 mins"
+  duration: string; 
+  boardingPoints: RoutePoint[];
+  droppingPoints: RoutePoint[];
 }
 
 export interface Schedule {
@@ -55,9 +60,9 @@ export interface Schedule {
   basePrice: number;
 }
 
-export interface TripData {
+export interface ITripData {
   _id: string;
-  bus: Bus;
+  bus: IBus;
   route: Route;
   schedule: Schedule;
   travelDate: string; // ISO string: "2025-11-12T00:00:00.000Z"
@@ -71,4 +76,22 @@ export interface TripSearchResponse {
   message: string;
   count: number;
   data: TripData[];
+}
+
+
+export interface TripData {
+  _id: string;
+  bus: Bus;
+  route: Route;
+  schedule: Schedule; 
+  travelDate: string; 
+  departureTime: string; 
+  arrivalTime: string;  
+  basePrice: number;
+  seatPricing: SeatPricing[];
+  status: 'scheduled' | 'cancelled' | 'completed';
+  verifiedTrip: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 }

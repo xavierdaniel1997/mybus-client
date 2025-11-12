@@ -1,10 +1,8 @@
 import { IBus, IBusRoute, IBusSchedule } from "@/app/types/myBus";
 import { api } from "@/lib/api";
 import { handleApiError } from "@/lib/utils/handleApiError";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import SeatGrid from "../SeatLayout/SeatGrid";
-import { featureIcons } from "../bus/FeatureIcons";
 import BusInfoCard from "../bus/BusInfoCard";
 import BoardingDroppingPoints from "../bus/BoardingDroppingPoints";
 import RouteInfoCard from "../bus/RouteInfoCard";
@@ -116,7 +114,7 @@ export default function StepConfirmation({
                   <SeatGrid
                     layout={busInfo.lowerDeck.seats}
                     isUpperDeck={false}
-                    price={scheduleInfo?.basePrice}
+                    basePrice={scheduleInfo?.basePrice}
                   />
                 </div>
               )}
@@ -127,7 +125,7 @@ export default function StepConfirmation({
                     <SeatGrid
                       layout={busInfo.upperDeck.seats}
                       isUpperDeck={true}
-                      price={scheduleInfo?.basePrice}
+                      basePrice={scheduleInfo?.basePrice}
                     />
                   </div>
                 )}

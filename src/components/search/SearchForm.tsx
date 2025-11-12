@@ -67,9 +67,11 @@ export default function SearchForm({ onSearch }: Props) {
     { name: "Sleeper", icon: <MdOutlineAirlineSeatIndividualSuite /> },
   ];
 
+
   const handleSelectSeatType = (seat: string) => {
-    setSeatType(seat)
-  }
+  setSeatType(prev => (prev === seat ? "" : seat));
+};
+
 
   //   const handleSwap = () => {
   //   setFrom(prev => {
