@@ -2,18 +2,26 @@
 import { useTripBookingStore } from "@/app/(store)/useTripBookingStore";
 import SeatGrid from "@/components/SeatLayout/SeatGrid";
 import BusTripDetails from "./BusTripDetails";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useAuthStore } from "@/app/(store)/useAuthStore";
+import AuthDialog from "../common/AuthDialog";
 
 export default function SeatSelection() {
-  const { tripData, selectedSeats, toggleSeat, nextStep } = useTripBookingStore();
+  const { tripData, selectedSeats, toggleSeat, nextStep, totalSeatPrice } = useTripBookingStore();
+  const {user} = useAuthStore()
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
 
   const seatPricing = tripData?.seatPricing || [];
 
   // helper to toggle seat selection
   const handleSeatClick = (seatId: string, available: boolean) => {
-    if (!available) return; // ignore unavailable seats
-    toggleSeat(seatId);
+    if(user){
+      if (!available) return;
+      toggleSeat(seatId);
+    }else{
+      setAuthDialogOpen(true);
+    }
   };
 
 
@@ -24,6 +32,9 @@ export default function SeatSelection() {
       return sum + (found?.price || 0);
     }, 0);
   }, [selectedSeats, seatPricing]);
+ useEffect(() => {
+  totalSeatPrice(totalPrice);
+}, [totalPrice, totalSeatPrice]);
 
   
   return (
@@ -107,7 +118,7 @@ export default function SeatSelection() {
 
     {/* Button */}
     <button
-      className="mt-3 w-full bg-blue-500 hover:bg-blue-600 transition-colors px-4 py-2 text-gray-100 font-semibold rounded-full"
+      className="mt-4 w-full bg-blue-500 hover:bg-blue-600 transition-colors px-4 py-2 text-gray-100 font-semibold rounded-full"
       onClick={nextStep}
     >
       Select Boarding & Dropping Point
@@ -118,6 +129,7 @@ export default function SeatSelection() {
         </div>
       </div>
       
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} tripId={tripData?._id}/>
     </div>
   );
 }

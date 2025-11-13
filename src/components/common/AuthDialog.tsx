@@ -24,9 +24,10 @@ import { handleApiError } from "@/lib/utils/handleApiError";
 interface AuthDialogProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  tripId?: string;
 }
 
-export default function AuthDialog({open, onOpenChange}: AuthDialogProps) {
+export default function AuthDialog({open, onOpenChange, tripId}: AuthDialogProps) {
   const [mode, setMode] = useState<"verifyEmail" | "login" | "signup" | "otp">(
     "login"
   );
@@ -183,7 +184,7 @@ export default function AuthDialog({open, onOpenChange}: AuthDialogProps) {
 
               {mode === "signup" && <SignupForm setMode={setMode} closeDialog={closeDialog} />}
 
-              {mode === "login" && <LoginForm closeDialog={closeDialog}/>}
+              {mode === "login" && <LoginForm closeDialog={closeDialog} tripId={tripId}/>}
             </div>
 
             {/* ===== FOOTER TEXT ===== */}

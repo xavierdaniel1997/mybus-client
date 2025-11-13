@@ -2,6 +2,7 @@
 "use client";
 import { create } from "zustand";
 import { ITripData } from "../types/tripSearchResponse";
+import { RoutePoint } from "../types/busroute";
 
 
 interface Passenger {
@@ -13,21 +14,23 @@ interface Passenger {
 interface TripBookingState {
   tripData: ITripData | null;
   selectedSeats: string[];
-  boardingPoint?: string;
-  droppingPoint?: string;
+  boardingPoint?: RoutePoint;
+  droppingPoint?: RoutePoint;
   passengers: Passenger[];
   currentStep: "seats" | "boarding" | "passenger";
+  seatPrice?: number;
 
   // Actions
   setTripData: (data: ITripData) => void;
   toggleSeat: (seatId: string) => void;
-  setBoardingPoint: (point: string) => void;
-  setDroppingPoint: (point: string) => void;
+  setBoardingPoint: (point: RoutePoint) => void;
+  setDroppingPoint: (point: RoutePoint) => void;
   setPassengers: (passengers: Passenger[]) => void;
   nextStep: () => void;
   prevStep: () => void;
   resetBooking: () => void;
   goToStep: (step: "seats" | "boarding" | "passenger") => void;
+  totalSeatPrice: (price: number) => void;
 }
 
 export const useTripBookingStore = create<TripBookingState>((set) => ({
@@ -71,4 +74,5 @@ goToStep: (step) => set({ currentStep: step }),
       passengers: [],
       currentStep: "seats",
     }),
+  totalSeatPrice: (price) => set({seatPrice: price}),
 }));

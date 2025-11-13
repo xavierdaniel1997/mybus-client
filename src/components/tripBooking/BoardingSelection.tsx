@@ -3,6 +3,7 @@
 import { useTripBookingStore } from "@/app/(store)/useTripBookingStore";
 import PointSelector from "../bus/PointSelector";
 import dayjs from "dayjs";
+import { RoutePoint } from "@/app/types/busroute";
 
 export default function BoardingSelection() {
   const {
@@ -34,7 +35,7 @@ export default function BoardingSelection() {
           }
           points={tripData?.route.boardingPoints || []}
           groupName="boardingPoints"
-          onSelect={(pointId: string) => setBoardingPoint(pointId)}
+          onSelect={(point: RoutePoint) => setBoardingPoint(point)}
         />
 
         {/* Right: Dropping Points + Button */}
@@ -54,7 +55,7 @@ export default function BoardingSelection() {
             }
             points={tripData?.route.droppingPoints || []}
             groupName="droppingPoints"
-            onSelect={(pointId: string) => setDroppingPoint(pointId)}
+            onSelect={(point: RoutePoint) => setDroppingPoint(point)}
           />
 
           {/* Button below right container */}

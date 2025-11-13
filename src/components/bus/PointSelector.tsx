@@ -9,7 +9,8 @@ interface PointSelectorProps {
   travelDate?: string;
   points: RoutePoint[];
   groupName: string;
-  onSelect: (pointId: string) => void;
+  // onSelect: (pointId: string) => void;
+  onSelect:(point: RoutePoint) => void;
 }
 
 export default function PointSelector({
@@ -22,9 +23,9 @@ export default function PointSelector({
 }: PointSelectorProps) {
   const [selectedPoint, setSelectedPoint] = useState<string | null>(null);
 
-  const handleSelect = (pointId: string) => {
-    setSelectedPoint(pointId);
-    onSelect?.(pointId);
+  const handleSelect = (point: RoutePoint) => {
+    setSelectedPoint(point._id);
+    onSelect?.(point);
   };
 
   return (
@@ -75,7 +76,7 @@ export default function PointSelector({
               type="radio"
               name={groupName}
               checked={selectedPoint === point._id}
-              onChange={() => handleSelect(point._id)}
+              onChange={() => handleSelect(point)}
               className="accent-blue-600 w-4 h-4"
             />
           </label>

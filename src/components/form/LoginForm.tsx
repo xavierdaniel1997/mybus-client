@@ -12,9 +12,10 @@ import { useEffect, useState } from "react";
 
 interface LoginFromProps {
   closeDialog: () => void;
+  tripId?: string;
 }
 
-export default function LoginForm({closeDialog} : LoginFromProps) {
+export default function LoginForm({closeDialog, tripId} : LoginFromProps) {
 
   const {
     register,
@@ -44,7 +45,7 @@ export default function LoginForm({closeDialog} : LoginFromProps) {
       reset()
       closeDialog()
       setAuth(response.data.user, response.data.accessToken)
-      const targetRoute = response.data.user.role === "ADMIN" ? "/admin" : "/";
+      const targetRoute = response.data.user.role === "ADMIN" ? "/admin" : tripId ? `/trip/${tripId}` : "/";
       router.push(targetRoute);
       setTimeout(() => {
         setLoading(false);
