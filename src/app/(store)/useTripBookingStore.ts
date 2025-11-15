@@ -11,6 +11,14 @@ interface Passenger {
   gender: string;
 }
 
+interface ContactDetails {
+  phoneCode: string;
+  phone: string;
+  email: string;
+  state: string;
+  whatsappEnabled: boolean;
+}
+
 interface TripBookingState {
   tripData: ITripData | null;
   selectedSeats: string[];
@@ -19,6 +27,7 @@ interface TripBookingState {
   passengers: Passenger[];
   currentStep: "seats" | "boarding" | "passenger";
   seatPrice?: number;
+  contact?: ContactDetails;
 
   // Actions
   setTripData: (data: ITripData) => void;
@@ -31,6 +40,7 @@ interface TripBookingState {
   resetBooking: () => void;
   goToStep: (step: "seats" | "boarding" | "passenger") => void;
   totalSeatPrice: (price: number) => void;
+   setContactDetails: (contact: ContactDetails) => void;
 }
 
 export const useTripBookingStore = create<TripBookingState>((set) => ({
@@ -75,4 +85,13 @@ goToStep: (step) => set({ currentStep: step }),
       currentStep: "seats",
     }),
   totalSeatPrice: (price) => set({seatPrice: price}),
+  // setContactDetails: (contact) => set({ contact }),
+  setContactDetails: (contact) =>
+  set((state) => {
+    if (JSON.stringify(state.contact) === JSON.stringify(contact)) {
+      return state; 
+    }
+    return { contact };
+  }),
+
 }));

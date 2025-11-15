@@ -1,33 +1,70 @@
 "use client";
 
 import { useTripBookingStore } from "@/app/(store)/useTripBookingStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ContactDetails from "../form/ContactDetails";
 import PassengerForm from "../form/PassengerForm";
 import RouteTimeLine from "../bus/RouteTimeLine";
 import dayjs from "dayjs";
+import { useAuthStore } from "@/app/(store)/useAuthStore";
+import { useForm } from "react-hook-form";
+import { PassengerFormValues } from "@/app/types/passangerFormValues";
+import { handleApiError } from "@/lib/utils/handleApiError";
+import { api } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 export default function PassengerInfo() {
   const {
     tripData,
     selectedSeats,
     setPassengers,
-    passengers,
-    prevStep,
+    contact,
     boardingPoint,
     droppingPoint,
     seatPrice,
   } = useTripBookingStore();
+  const router = useRouter()
 
-  const [localPassengers, setLocalPassengers] = useState(
-    passengers.length
-      ? passengers
-      : selectedSeats.map(() => ({ name: "", age: "", gender: "M" }))
-  );
+ const { register, handleSubmit, watch, setValue } = useForm<PassengerFormValues>({
+    defaultValues: {
+      passengers: selectedSeats.map(() => ({
+        name: "",
+        age: 0,
+        gender: "",
+      })),
+    },
+  });
+
+ 
 
   const stops = [boardingPoint, droppingPoint].filter(
     (p): p is NonNullable<typeof boardingPoint> => Boolean(p)
   );
+
+  const onContinue = async (data: PassengerFormValues) => {
+    setPassengers(data?.passengers); 
+  try {
+    console.log("contact details", contact, "passanger details", data.passengers, "selected seates", selectedSeats, "tripId", tripData?._id)
+    
+    const response = await api.post("/booking/reserve", {
+      tripId: tripData?._id,
+      seatIds: selectedSeats,
+      passengers: data.passengers,
+      contact,
+      seatPrice,
+      boardingPoint,
+      droppingPoint
+    });
+    console.log("resposne of the reserve ticket booking.....", response)
+    if(response.status === 200){
+      router.push("/payment");
+    }
+  } catch (error) {
+    handleApiError(error)
+  }
+};
+
+
 
   return (
     <div className="mx-auto w-[95%] sm:w-[90%] lg:w-[85%] max-w-6xl pb-10">
@@ -43,6 +80,10 @@ export default function PassengerInfo() {
               key={idx}
               passengerNumber={idx + 1}
               seatInfo={seat}
+              index={idx}
+            register={register}
+            watch={watch}
+            setValue={setValue}
             />
           ))}
         </div>
@@ -96,6 +137,7 @@ export default function PassengerInfo() {
           {/* Button */}
           <button
             className="mt-4 w-full bg-blue-500 hover:bg-blue-600 transition-colors px-4 py-2 text-gray-100 font-semibold rounded-full text-sm sm:text-base"
+            onClick={handleSubmit(onContinue)}
           >
             Continue Booking
           </button>

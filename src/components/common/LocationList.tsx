@@ -33,7 +33,7 @@ export default function LocationList() {
                     Discover Your Journey
                 </h1>
             </div>
-            <div className="flex flex-wrap justify-start gap-5">
+            <div className="flex flex-wrap justify-center gap-5">
                 {locationInfo.length > 0 && locationInfo.map((location: ILocation) => (
                     <LocationCard key={location._id} locationName={location.name} locationImage={location.locationImage}/>
                 ))}

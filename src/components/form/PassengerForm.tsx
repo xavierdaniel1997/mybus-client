@@ -1,93 +1,108 @@
 "use client";
 
-import { useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import { useState } from "react";
+import type { UseFormRegister, UseFormWatch, UseFormSetValue } from "react-hook-form";
+import { PassengerFormValues } from "@/app/types/passangerFormValues";
+
 
 interface PassengerFormProps {
   passengerNumber: number;
   seatInfo: string;
+  index: number;
+  register: UseFormRegister<PassengerFormValues>;
+  watch: UseFormWatch<PassengerFormValues>;
+  setValue: UseFormSetValue<PassengerFormValues>;
 }
+
 
 export default function PassengerForm({
   passengerNumber,
   seatInfo,
+  index,
+  register,
+  watch,
+  setValue
 }: PassengerFormProps) {
+
   const [isOpen, setIsOpen] = useState(true);
-  const [gender, setGender] = useState("");
+  const selectedGender = watch(`passengers.${index}.gender`);
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 transition-all">
+    <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-sm border p-4">
+
       {/* Header */}
       <div
-        className="flex items-center justify-between cursor-pointer"
+        className="flex justify-between cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-green-100 flex items-center justify-center">
-            <FaUser className="text-green-600 text-lg sm:text-xl" />
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+            <FaUser className="text-green-600" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-800 text-base sm:text-lg">
-              Passenger {passengerNumber}
-            </h3>
-            <p className="text-xs sm:text-sm text-gray-500">{seatInfo}</p>
+            <h3 className="font-semibold">Passenger {passengerNumber}</h3>
+            <p className="text-gray-500 text-sm">{seatInfo}</p>
           </div>
         </div>
-        {isOpen ? (
-          <IoIosArrowUp className="text-gray-500 text-lg sm:text-xl" />
-        ) : (
-          <IoIosArrowDown className="text-gray-500 text-lg sm:text-xl" />
-        )}
+
+        {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
       </div>
 
-      {/* Form Section */}
       {isOpen && (
-        <div className="mt-4 border-t border-dashed pt-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="mt-4 border-t pt-4">
+
+          {/* Name & Age */}
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                Full Name <span className="text-red-500">*</span>
-              </label>
+              <label className="text-sm">Full Name *</label>
               <input
-                type="text"
+                {...register(`passengers.${index}.name`, { required: true })}
                 placeholder="Enter name"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full border rounded-md px-3 py-2"
               />
             </div>
+
             <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                Age <span className="text-red-500">*</span>
-              </label>
+              <label className="text-sm">Age *</label>
               <input
+                {...register(`passengers.${index}.age`, { required: true })}
                 type="number"
                 placeholder="Enter age"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full border rounded-md px-3 py-2"
               />
             </div>
           </div>
 
+          {/* Gender */}
           <div className="mt-4">
-            <p className="text-sm sm:text-base text-gray-700 mb-2">
-              Gender <span className="text-red-500">*</span>
-            </p>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+            <p className="text-sm mb-2">Gender *</p>
+
+            <div className="flex gap-4">
               <button
-                onClick={() => setGender("Male")}
-                className={`flex-1 border rounded-full px-4 py-2 text-sm sm:text-base transition-all ${
-                  gender === "Male"
-                    ? "border-blue-500 text-blue-600 bg-blue-50"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                type="button"
+                onClick={() =>
+                  setValue(`passengers.${index}.gender`, "Male")
+                }
+                className={`flex-1 border rounded-full px-4 py-2 ${
+                  selectedGender === "Male"
+                    ? "bg-blue-50 border-blue-500 text-blue-600"
+                    : "border-gray-300"
                 }`}
               >
                 Male
               </button>
+
               <button
-                onClick={() => setGender("Female")}
-                className={`flex-1 border rounded-full px-4 py-2 text-sm sm:text-base transition-all ${
-                  gender === "Female"
-                    ? "border-blue-500 text-blue-600 bg-blue-50"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                type="button"
+                onClick={() =>
+                  setValue(`passengers.${index}.gender`, "Female")
+                }
+                className={`flex-1 border rounded-full px-4 py-2 ${
+                  selectedGender === "Female"
+                    ? "bg-blue-50 border-blue-500 text-blue-600"
+                    : "border-gray-300"
                 }`}
               >
                 Female

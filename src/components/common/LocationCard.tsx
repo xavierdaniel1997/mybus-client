@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function LocationCard({locationName, locationImage}: {locationName: string, locationImage: string}) {
   return (
-    <div className="relative w-60 h-50">
+    <div className="relative w-64 h-50">
       <Image
         src={locationImage}
         alt={locationName}
