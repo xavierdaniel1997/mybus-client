@@ -12,12 +12,14 @@ import { PassengerFormValues } from "@/app/types/passangerFormValues";
 import { handleApiError } from "@/lib/utils/handleApiError";
 import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import TripSummaryPanel from "./TripSummaryPanel";
 
 export default function PassengerInfo() {
   const {
     tripData,
     selectedSeats,
     setPassengers,
+    setRazorpayOrder,
     contact,
     boardingPoint,
     droppingPoint,
@@ -57,6 +59,7 @@ export default function PassengerInfo() {
     });
     console.log("resposne of the reserve ticket booking.....", response)
     if(response.status === 200){
+      setRazorpayOrder(response.data.razorpayOrder)
       router.push("/payment");
     }
   } catch (error) {
@@ -90,8 +93,8 @@ export default function PassengerInfo() {
 
         {/* Right Section (Trip Summary) */}
         <div className="w-full lg:w-1/3">
-          <div className="space-y-6 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
-            {/* Trip Header */}
+          {/* <div className="space-y-6 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
+          
             <div>
               <h2 className="text-base sm:text-lg font-semibold text-gray-800">
                 {tripData?.bus.name}
@@ -110,10 +113,10 @@ export default function PassengerInfo() {
               </p>
             </div>
 
-            {/* Route Timeline */}
+   
             <RouteTimeLine points={stops || []} />
 
-            {/* Seats Info */}
+
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
                 <div className="flex flex-wrap items-center gap-2">
@@ -132,7 +135,16 @@ export default function PassengerInfo() {
                 </p>
               </div>
             </div>
-          </div>
+          </div>  */}
+
+  {tripData ? (
+    <TripSummaryPanel
+      tripData={tripData}
+      stops={stops || []}
+      selectedSeats={selectedSeats}
+      seatPrice={seatPrice || 0}
+    />
+  ) : null}
 
           {/* Button */}
           <button

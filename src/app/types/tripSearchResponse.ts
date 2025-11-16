@@ -6,7 +6,7 @@ import { IBus } from "./myBus";
 export interface SeatPricing {
   seatId: string;
   price: number;
-  isAvailable: boolean;
+  isBooked: boolean;
   _id: string;
 }
 

@@ -24,7 +24,6 @@ interface TripCardProps {
 export default function TripCard({
   busName,
   busType,
-  layoutName,
   information,
   departure,
   arrival,
@@ -57,9 +56,9 @@ export default function TripCard({
         {/* Center Section */}
         <div className="w-full md:w-1/3 text-left">
           <div className="flex items-center gap-2 text-sm sm:text-base font-semibold text-gray-800">
-            <span>{departure}</span>
-            <BsArrowRight className="text-gray-400 text-base sm:text-lg" />
             <span>{arrival}</span>
+            <BsArrowRight className="text-gray-400 text-base sm:text-lg" />
+            <span>{departure}</span>
           </div>
           <p className="text-xs text-gray-500 mt-1">
             {duration} • {seatsAvailable} Seats{" "}

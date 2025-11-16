@@ -1,21 +1,26 @@
 "use client";
 
+import { useTripBookingStore } from "@/app/(store)/useTripBookingStore";
 import Card from "@/components/payment/Card";
-import Divider from "@/components/payment/Divider";
-import OptionRow from "@/components/payment/OptionRow";
 import SectionTitle from "@/components/payment/SectionTitle";
-import Image from "next/image";
-import { useState } from "react";
+import TripSummaryPanel from "@/components/tripBooking/TripSummaryPanel";
 import { FiCreditCard, FiChevronRight } from "react-icons/fi";
-import { LuBanknote, LuQrCode } from "react-icons/lu";
+import { LuBanknote} from "react-icons/lu";
 import { MdOutlineContactMail } from "react-icons/md";
 import { SiRazorpay } from "react-icons/si";
 
 export default function PaymentDetails() {
-  const [selectedUPI, setSelectedUPI] = useState<string>("");
+  const {tripData, selectedSeats, seatPrice, boardingPoint, droppingPoint, contact, passengers, razorpayOrder} = useTripBookingStore()
+
+    const stops = [boardingPoint, droppingPoint].filter(
+    (p): p is NonNullable<typeof boardingPoint> => Boolean(p)
+  );
+
+
+  console.log("checking the razorpayOrder.............", razorpayOrder)
 
   return (
-    <div className="mx-auto w-[95%] sm:w-[90%] lg:w-[85%] max-w-6xl px-8 py-12 flex flex-row gap-8">
+    <div className="mx-auto w-[95%] sm:w-[90%] lg:w-[85%] max-w-6xl px-8 py-12 flex flex-row gap-14">
       <div className="w-1/2 space-y-4">
         {/* Top badges */}
         <div className="flex justify-between text-gray-600 text-sm">
@@ -96,7 +101,16 @@ export default function PaymentDetails() {
         </Card>
       </div>
 
-      <div className="w-1/2">Passanger Details</div>
+      <div className="w-1/2">
+       {tripData && <TripSummaryPanel
+            tripData={tripData}
+            stops={stops || []}
+            selectedSeats={selectedSeats}
+            seatPrice={seatPrice || 0}
+            contact={contact}
+            passengers={passengers}
+          />}
+      </div>
     </div>
   );
 }

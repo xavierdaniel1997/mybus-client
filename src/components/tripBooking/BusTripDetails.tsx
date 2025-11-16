@@ -6,6 +6,7 @@ import Image from "next/image";
 import { FaBusAlt, FaRoute, FaMapMarkerAlt, FaStar } from "react-icons/fa";
 import RouteTimeLine from "../bus/RouteTimeLine";
 import dayjs from "dayjs";
+import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 
 export default function BusTripDetails() {
   const { tripData } = useTripBookingStore();
@@ -21,6 +22,20 @@ export default function BusTripDetails() {
       ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+
+  const imageScrollRef = useRef<HTMLDivElement>(null);
+
+const scrollContainer = (direction: "left" | "right") => {
+  if (!imageScrollRef.current) return;
+
+  const amount = 260; // width per image + spacing
+
+  imageScrollRef.current.scrollBy({
+    left: direction === "left" ? -amount : amount,
+    behavior: "smooth"
+  });
+};
+
 
   const tabs = [
     { label: "Bus route", ref: routeRef },
@@ -52,7 +67,7 @@ export default function BusTripDetails() {
       </div>
 
       {/* Image Section */}
-      <div className="flex items-center overflow-x-auto">
+      {/* <div className="flex items-center overflow-x-auto">
         {tripData?.bus.images.map((img) => (
           <Image
             key={img}
@@ -64,7 +79,45 @@ export default function BusTripDetails() {
             className="p-2 object-cover w-60 h-44 rounded-xl"
           />
         ))}
-      </div>
+      </div> */}
+
+      {/* Image Carousel */}
+<div className="relative w-full overflow-hidden">
+  {/* Left Button */}
+  <button
+    onClick={() => scrollContainer("left")}
+    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md p-2 rounded-full shadow hover:bg-white z-10"
+  >
+    <BsChevronLeft size={16} />
+  </button>
+
+  {/* Images wrapper */}
+  <div
+    ref={imageScrollRef}
+    className="flex overflow-x-hidden scroll-smooth gap-3 px-2"
+  >
+    {tripData?.bus.images.map((img) => (
+      <Image
+        key={img}
+        src={img}
+        alt="Bus"
+        width={240}
+        height={180}
+        unoptimized
+        className="object-cover rounded-xl"
+      />
+    ))}
+  </div>
+
+  {/* Right Button */}
+  <button
+    onClick={() => scrollContainer("right")}
+    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md p-2 rounded-full shadow hover:bg-white z-10"
+  >
+    <BsChevronRight size={16} />
+  </button>
+</div>
+
 
       {/* Tabs */}
       <div className="flex border-b text-sm font-medium text-gray-600">

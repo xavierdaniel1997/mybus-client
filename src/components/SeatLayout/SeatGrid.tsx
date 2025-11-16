@@ -9,7 +9,7 @@ type LayoutSeat = { id: string; type: string };
 type PricingEntry = {
   seatId: string;
   price: number;
-  isAvailable: boolean;
+  isBooking?: boolean;
   _id?: string;
 };
 
@@ -17,17 +17,14 @@ interface SeatGridProps {
   layout: LayoutSeat[][];
   isUpperDeck: boolean;
   basePrice?: number;
-  seatPricing?: PricingEntry[]; 
+  seatPricing?: PricingEntry[];
   isUser?: boolean;
   onSeatClick?: (seatId: string, available: boolean) => void;
- selectedSeats?: string[];
+  selectedSeats?: string[];
 }
 
-// small helper to choose classes
-// const seatBase = "flex flex-col justify-center items-center text-xs rounded-sm mb-1 select-none";
 const seatBase =
   "flex flex-col justify-center items-center text-xs rounded-sm mb-1 select-none transition-all duration-200";
-
 
 function formatPrice(p?: number | null) {
   if (typeof p !== "number") return "";
@@ -40,7 +37,7 @@ const SeatCell = React.memo(function SeatCell({
   price,
   available,
   isUser,
-   selected,
+  selected,
   onClick,
 }: {
   seatId: string;
@@ -48,16 +45,12 @@ const SeatCell = React.memo(function SeatCell({
   price?: number | null;
   available: boolean;
   isUser?: boolean;
-   selected?: boolean;
+  selected?: boolean;
   onClick?: () => void;
 }) {
-  // const classes = `${seatBase} ${sizeClasses} ${
-  //   available ? "bg-gray-400/90 text-white hover:bg-gray-700 cursor-pointer" : "bg-gray-300 text-gray-600 cursor-not-allowed"
-  // }`;
-
-   const classes = `${seatBase} ${sizeClasses} ${
+  const classes = `${seatBase} ${sizeClasses} ${
     selected
-      ? "bg-gray-700 text-white" 
+      ? "bg-gray-700 text-white"
       : available
       ? "bg-gray-400/90 text-white hover:bg-gray-700 cursor-pointer"
       : "bg-gray-300 text-gray-600 cursor-not-allowed"
@@ -78,18 +71,23 @@ const SeatCell = React.memo(function SeatCell({
   );
 });
 
-export default function SeatGrid({ layout, isUpperDeck, seatPricing = [], isUser, onSeatClick, selectedSeats }: SeatGridProps) {
-  // create a fast lookup map from seatId -> {price,isAvailable}
+export default function SeatGrid({
+  layout,
+  isUpperDeck,
+  seatPricing = [],
+  isUser,
+  onSeatClick,
+  selectedSeats,
+}: SeatGridProps) {
+  // seatId → price + isBooking map
   const priceMap = useMemo(() => {
-    const map: Record<string, { price: number; isAvailable: boolean }> = {};
+    const map: Record<string, { price: number; isBooking: boolean }> = {};
     for (const p of seatPricing) {
-      // seatId may be like 'LL1' etc. store directly
-      map[p.seatId] = { price: p.price, isAvailable: !!p.isAvailable };
+      map[p.seatId] = { price: p.price, isBooking: !!p.isBooking };
     }
     return map;
   }, [seatPricing]);
 
-  // a small helper so layout rendering is stable
   const getSizeClasses = (seatType: string) => {
     if (seatType === "seater") return isUser ? "w-12 h-20" : "w-8 h-8";
     return isUser ? "w-12 h-20" : "w-10 h-16";
@@ -97,9 +95,8 @@ export default function SeatGrid({ layout, isUpperDeck, seatPricing = [], isUser
 
   return (
     <div className="bg-gray-100 p-4 border-2 border-gray-200 rounded-lg relative inline-block">
-      {/* TOP VIEW (driver + door) */}
       {!isUpperDeck ? (
-        <div className="flex justify-between items-center mb-3 px-2">
+        <div className="flex justify-between items-center mb-5 px-2">
           <div className="flex flex-col items-center">
             <div className="w-8 h-8 flex justify-center items-center border-2 border-gray-500 text-gray-500 text-xl rounded-md">
               <BsDoorOpen />
@@ -120,26 +117,34 @@ export default function SeatGrid({ layout, isUpperDeck, seatPricing = [], isUser
       <div className="flex">
         {layout.map((col, colIndex) => (
           <div key={colIndex} className="flex flex-col items-center mx-1">
-            {col.map((seat, index) =>
-              seat.type === "Aisle" ? (
-                <div key={index} className="h-8 p-1" />
-              ) : (
+            {col.map((seat, index) => {
+              if (seat.type === "Aisle") {
+                return <div key={index} className="h-8 p-1" />;
+              }
+
+              const seatInfo = priceMap[seat.id];
+              const price = seatInfo?.price ?? null;
+
+              // ✔ FIXED LOGIC: isBooking = true → seat is NOT available
+              const isBooked = seatInfo?.isBooking === true;
+              const available = !isBooked;
+
+              return (
                 <SeatCell
                   key={seat.id}
                   seatId={seat.id}
                   sizeClasses={getSizeClasses(seat.type)}
-                  price={priceMap[seat.id]?.price ?? null}
-                  available={priceMap[seat.id] ? priceMap[seat.id].isAvailable : true}
+                  price={price}
+                  available={available} // ✔ FIXED
                   isUser={isUser}
                   selected={selectedSeats?.includes(seat.id)}
-                  onClick={() => onSeatClick?.(seat.id, priceMap[seat.id]?.isAvailable ?? true)}
+                  onClick={() => onSeatClick?.(seat.id, available)} // ✔ FIXED
                 />
-              )
-            )}
+              );
+            })}
           </div>
         ))}
       </div>
     </div>
   );
 }
-
