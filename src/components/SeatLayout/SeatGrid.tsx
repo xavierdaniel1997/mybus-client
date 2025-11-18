@@ -9,7 +9,7 @@ type LayoutSeat = { id: string; type: string };
 type PricingEntry = {
   seatId: string;
   price: number;
-  isBooking?: boolean;
+  isBooked?: boolean;
   _id?: string;
 };
 
@@ -81,12 +81,14 @@ export default function SeatGrid({
 }: SeatGridProps) {
   // seatId → price + isBooking map
   const priceMap = useMemo(() => {
-    const map: Record<string, { price: number; isBooking: boolean }> = {};
+    const map: Record<string, { price: number; isBooked: boolean }> = {};
     for (const p of seatPricing) {
-      map[p.seatId] = { price: p.price, isBooking: !!p.isBooking };
+      map[p.seatId] = { price: p.price, isBooked: !!p.isBooked };
     }
     return map;
   }, [seatPricing]);
+
+  
 
   const getSizeClasses = (seatType: string) => {
     if (seatType === "seater") return isUser ? "w-12 h-20" : "w-8 h-8";
@@ -126,8 +128,10 @@ export default function SeatGrid({
               const price = seatInfo?.price ?? null;
 
               // ✔ FIXED LOGIC: isBooking = true → seat is NOT available
-              const isBooked = seatInfo?.isBooking === true;
+              const isBooked = seatInfo?.isBooked === true;
               const available = !isBooked;
+
+              
 
               return (
                 <SeatCell
@@ -135,10 +139,10 @@ export default function SeatGrid({
                   seatId={seat.id}
                   sizeClasses={getSizeClasses(seat.type)}
                   price={price}
-                  available={available} // ✔ FIXED
+                  available={available} 
                   isUser={isUser}
                   selected={selectedSeats?.includes(seat.id)}
-                  onClick={() => onSeatClick?.(seat.id, available)} // ✔ FIXED
+                  onClick={() => onSeatClick?.(seat.id, available)} 
                 />
               );
             })}

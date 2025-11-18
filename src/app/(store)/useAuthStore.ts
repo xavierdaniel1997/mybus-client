@@ -1,4 +1,4 @@
-// authStore.ts
+
 'use client';
 
 import { create } from 'zustand';
@@ -11,6 +11,7 @@ interface AuthState {
   isAuthenticated: boolean;
   tokenExpiry: number | null; // timestamp in ms
   _hasHydrated: boolean; // internal flag to indicate persist finished
+  
   setAuth: (user: IUser, token: string, expiresIn?: number) => void;
   clearAuth: () => void;
   setToken: (token: string, expiresIn: number) => void;

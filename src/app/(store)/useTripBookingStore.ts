@@ -19,11 +19,20 @@ interface ContactDetails {
   whatsappEnabled: boolean;
 }
 
+// interface RazorpayOrder {
+//   id: string;
+//   amount: number;
+//   currency: string;
+// }
+
 interface RazorpayOrder {
   id: string;
   amount: number;
   currency: string;
+  receipt: string;
+  status: string;
 }
+
 
 interface TripBookingState {
   tripData: ITripData | null;
@@ -102,6 +111,7 @@ export const useTripBookingStore = create<TripBookingState>((set) => ({
       droppingPoint: undefined,
       passengers: [],
       currentStep: "seats",
+      seatPrice: 0,
       razorpayOrder: null,
     }),
 

@@ -4,20 +4,117 @@ import { useTripBookingStore } from "@/app/(store)/useTripBookingStore";
 import Card from "@/components/payment/Card";
 import SectionTitle from "@/components/payment/SectionTitle";
 import TripSummaryPanel from "@/components/tripBooking/TripSummaryPanel";
+import { api } from "@/lib/api";
+import { useEffect } from "react";
 import { FiCreditCard, FiChevronRight } from "react-icons/fi";
 import { LuBanknote} from "react-icons/lu";
 import { MdOutlineContactMail } from "react-icons/md";
 import { SiRazorpay } from "react-icons/si";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
+
+
+interface RazorpayHandlerResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+
+
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  handler: (response: RazorpayHandlerResponse) => void;
+  theme: {
+    color: string;
+  };
+}
+
+declare global {
+  interface Window {
+    Razorpay: new (options: RazorpayOptions) => {
+      open: () => void;
+    };
+  }
+}
+
 
 export default function PaymentDetails() {
-  const {tripData, selectedSeats, seatPrice, boardingPoint, droppingPoint, contact, passengers, razorpayOrder} = useTripBookingStore()
-
+  const {tripData, selectedSeats, seatPrice, boardingPoint, droppingPoint, contact, passengers, razorpayOrder, resetBooking} = useTripBookingStore()
+  const router = useRouter()
     const stops = [boardingPoint, droppingPoint].filter(
     (p): p is NonNullable<typeof boardingPoint> => Boolean(p)
   );
 
 
-  console.log("checking the razorpayOrder.............", razorpayOrder)
+   // Load Razorpay Script
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
+  const openRazorpay = () => {
+    if (!razorpayOrder) {
+      console.error("Missing Razorpay order.");
+      return;
+    }
+
+    if (!tripData?._id || selectedSeats.length === 0) {
+      console.error("Missing trip info or seats.");
+      return;
+    }
+
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY!,
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency,
+      name: "Trip Booking",
+      description: "Bus Ticket Payment",
+      order_id: razorpayOrder.id,
+
+      handler: async (response: RazorpayHandlerResponse) => {
+        try {
+          const res = await api.post("/booking/verify-payment", {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            bookingId: razorpayOrder.receipt,
+            tripId: tripData._id,
+            seatIds: selectedSeats,
+          });
+
+          if (res.data.success) {
+            resetBooking()
+            toast.success("Payment Success! Booking Confirmed.");
+            router.push("/booking")
+
+          } else {
+            toast.error("Payment verification failed.");
+          }
+        } catch (err) {
+          console.error("Verification error:", err);
+          alert("Server verification failed.");
+        }
+      },
+
+      theme: { color: "#1A73E8" },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+
+
+
+
 
   return (
     <div className="mx-auto w-[95%] sm:w-[90%] lg:w-[85%] max-w-6xl px-8 py-12 flex flex-row gap-14">
@@ -59,7 +156,7 @@ export default function PaymentDetails() {
             {/* Pay Now Button */}
             <button
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition"
-              onClick={() => console.log("Open Razorpay")}
+              onClick={openRazorpay}
             >
               Pay Now
             </button>

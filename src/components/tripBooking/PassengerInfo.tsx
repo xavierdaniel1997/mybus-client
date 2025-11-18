@@ -36,6 +36,8 @@ export default function PassengerInfo() {
       })),
     },
   });
+  const [loading, setLoading] = useState(false);
+
 
  
 
@@ -44,6 +46,7 @@ export default function PassengerInfo() {
   );
 
   const onContinue = async (data: PassengerFormValues) => {
+     setLoading(true);
     setPassengers(data?.passengers); 
   try {
     console.log("contact details", contact, "passanger details", data.passengers, "selected seates", selectedSeats, "tripId", tripData?._id)
@@ -63,6 +66,7 @@ export default function PassengerInfo() {
       router.push("/payment");
     }
   } catch (error) {
+    setLoading(false);
     handleApiError(error)
   }
 };
@@ -93,49 +97,6 @@ export default function PassengerInfo() {
 
         {/* Right Section (Trip Summary) */}
         <div className="w-full lg:w-1/3">
-          {/* <div className="space-y-6 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
-          
-            <div>
-              <h2 className="text-base sm:text-lg font-semibold text-gray-800">
-                {tripData?.bus.name}
-              </h2>
-              <p className="text-sm text-gray-600">
-                {tripData?.arrivalTime} – {tripData?.departureTime} ·{" "}
-                {tripData?.travelDate
-                  ? dayjs(tripData.travelDate).format("ddd DD MMM")
-                  : ""}{" "}
-                <span className="text-green-600">
-                  {tripData?.route.duration}
-                </span>
-              </p>
-              <p className="text-sm text-gray-700 mt-1">
-                {tripData?.bus.layoutName}, {tripData?.bus.registrationNo}
-              </p>
-            </div>
-
-   
-            <RouteTimeLine points={stops || []} />
-
-
-            <div>
-              <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-medium">{selectedSeats.length} Seats:</p>
-                  {selectedSeats.map((seat: string) => (
-                    <span
-                      key={seat}
-                      className="text-sm px-2 py-1 bg-gray-200 rounded-full font-medium"
-                    >
-                      {seat}
-                    </span>
-                  ))}
-                </div>
-                <p className="font-semibold text-lg mt-1 sm:mt-0">
-                  ₹ {seatPrice}
-                </p>
-              </div>
-            </div>
-          </div>  */}
 
   {tripData ? (
     <TripSummaryPanel
@@ -147,12 +108,23 @@ export default function PassengerInfo() {
   ) : null}
 
           {/* Button */}
-          <button
+          {/* <button
             className="mt-4 w-full bg-blue-500 hover:bg-blue-600 transition-colors px-4 py-2 text-gray-100 font-semibold rounded-full text-sm sm:text-base"
             onClick={handleSubmit(onContinue)}
           >
             Continue Booking
-          </button>
+          </button> */}
+
+          <button
+  disabled={loading}
+  className={`mt-4 w-full transition-colors px-4 py-2 text-gray-100 font-semibold rounded-full text-sm sm:text-base
+    ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}
+  `}
+  onClick={handleSubmit(onContinue)}
+>
+  {loading ? "Processing..." : "Continue Booking"}
+</button>
+
         </div>
       </div>
     </div>

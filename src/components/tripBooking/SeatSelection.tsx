@@ -5,9 +5,11 @@ import BusTripDetails from "./BusTripDetails";
 import { useEffect, useMemo, useState } from "react";
 import { useAuthStore } from "@/app/(store)/useAuthStore";
 import AuthDialog from "../common/AuthDialog";
+import { useAuthDialogStore } from "@/app/(store)/useAuthDialogStore";
 
 export default function SeatSelection() {
   const { tripData, selectedSeats, toggleSeat, nextStep, totalSeatPrice } = useTripBookingStore();
+  const { open, openDialog, closeDialog } = useAuthDialogStore();
   const {user} = useAuthStore()
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
@@ -22,7 +24,8 @@ export default function SeatSelection() {
       if (!available) return;
       toggleSeat(seatId);
     }else{
-      setAuthDialogOpen(true);
+      // setAuthDialogOpen(true);
+      openDialog()
     }
   };
 
@@ -131,7 +134,8 @@ export default function SeatSelection() {
         </div>
       </div>
       
-      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} tripId={tripData?._id}/>
+      {/* <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} tripId={tripData?._id}/> */}
+      <AuthDialog open={open} onOpenChange={(v) => (v ? openDialog() : closeDialog())} tripId={tripData?._id}/>
     </div>
   );
 }

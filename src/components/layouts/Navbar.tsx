@@ -17,6 +17,7 @@ import {useAuthStore} from "@/app/(store)/useAuthStore";
 import {IoLogOut} from "react-icons/io5";
 import { handleApiError } from "@/lib/utils/handleApiError";
 import { api } from "@/lib/api";
+import { useAuthDialogStore } from "@/app/(store)/useAuthDialogStore";
 
 interface NavbarProps {
   isAdmin?: boolean;
@@ -28,6 +29,8 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
   const [openDropDown, setOpenDropDown] = useState(false)
 
   const {user, clearAuth} = useAuthStore();
+  const { open, openDialog, closeDialog } = useAuthDialogStore();
+
 
   const handleToggleDropDown = () => {
     setOpenDropDown(!openDropDown)
@@ -70,7 +73,7 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
             {!isAdmin && (
               <>
                 <Link
-                  href="#"
+                  href="/booking"
                   className="flex items-center text-gray-700 hover:text-blue-600 transition"
                 >
                   <FaTicketAlt className="mr-1" />
@@ -113,7 +116,8 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
             ) : (
               <button
                 className="cursor-pointer flex items-center text-gray-700 hover:text-blue-600 transition"
-                onClick={() => setIsDialogOpen(true)}
+                // onClick={() => setIsDialogOpen(true)}
+                onClick={() => openDialog()}
               >
                 <FaUser className="mr-2" />
                 Login/Sign In
@@ -134,7 +138,7 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
         {!isAdmin && mobileMenuOpen && (
           <div className="md:hidden mt-2 space-y-2 pb-4 animate-fade-in">
             <Link
-              href="#"
+              href="/booking"
               className="flex items-center text-gray-700 hover:text-blue-600 transition px-2 py-2"
             >
               <FaTicketAlt className="mr-2" /> My Bookings
@@ -154,7 +158,8 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
           </div>
         )}
       </div>
-      <AuthDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+      {/* <AuthDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} /> */}
+      <AuthDialog open={open} onOpenChange={(v) => (v ? openDialog() : closeDialog())} />
     </nav>
   );
 }

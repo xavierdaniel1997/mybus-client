@@ -20,6 +20,7 @@ import {verifyEmailSchema, VerifyEmailData} from "@/lib/validations/auth";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { handleApiError } from "@/lib/utils/handleApiError";
+import { useAuthDialogStore } from "@/app/(store)/useAuthDialogStore";
      
 interface AuthDialogProps {
   open?: boolean;
@@ -31,18 +32,20 @@ export default function AuthDialog({open, onOpenChange, tripId}: AuthDialogProps
   const [mode, setMode] = useState<"verifyEmail" | "login" | "signup" | "otp">(
     "login"
   );
+
+  const { open: isDialogOpen, closeDialog, openDialog } = useAuthDialogStore();
   const [internalOpen, setInternalOpen] = useState(false);
 
   const isControlled = open !== undefined;
-  const isDialogOpen = isControlled ? open : internalOpen;
+  // const isDialogOpen = isControlled ? open : internalOpen;
 
   const handleOpenChange = isControlled
     ? onOpenChange
     : (v: boolean) => setInternalOpen(v);
 
-  const closeDialog = () => {
-  handleOpenChange?.(false);
-};
+//   const closeDialog = () => {
+//   handleOpenChange?.(false);
+// };
 
   const toggleMode = () =>
     setMode((prev) =>
@@ -96,7 +99,10 @@ export default function AuthDialog({open, onOpenChange, tripId}: AuthDialogProps
     }
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
+    <Dialog 
+    // open={isDialogOpen} onOpenChange={handleOpenChange}   
+     open={isDialogOpen} onOpenChange={(v) => (v ? openDialog() : closeDialog())}
+    >
       <DialogContent
         className={`${
           mode === "signup" ? "lg:max-w-5xl" : "lg:max-w-4xl min-h-[500px]"

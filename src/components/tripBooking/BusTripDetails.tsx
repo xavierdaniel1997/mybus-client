@@ -86,7 +86,7 @@ const scrollContainer = (direction: "left" | "right") => {
   {/* Left Button */}
   <button
     onClick={() => scrollContainer("left")}
-    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md p-2 rounded-full shadow hover:bg-white z-10"
+    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full shadow hover:bg-white/20 z-10"
   >
     <BsChevronLeft size={16} />
   </button>
@@ -112,7 +112,7 @@ const scrollContainer = (direction: "left" | "right") => {
   {/* Right Button */}
   <button
     onClick={() => scrollContainer("right")}
-    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md p-2 rounded-full shadow hover:bg-white z-10"
+    className="absolute right-2 top-1/2 -translate-y-1/2  p-2 rounded-full hover:bg-white/30 z-10"
   >
     <BsChevronRight size={16} />
   </button>
