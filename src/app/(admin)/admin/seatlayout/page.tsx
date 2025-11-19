@@ -217,7 +217,7 @@ export default function SeatLayout() {
             <option value="" disabled>
               Select Bus Type
             </option>
-            <option value="seater">Semi Sleeper</option>
+            <option value="seater">Seater</option>
             <option value="seater+sleeper">Seater / Sleeper</option>
             <option value="sleeper">Sleeper</option>
           </select>

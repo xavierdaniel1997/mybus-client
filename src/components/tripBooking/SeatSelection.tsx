@@ -11,9 +11,6 @@ export default function SeatSelection() {
   const { tripData, selectedSeats, toggleSeat, nextStep, totalSeatPrice } = useTripBookingStore();
   const { open, openDialog, closeDialog } = useAuthDialogStore();
   const {user} = useAuthStore()
-  const [authDialogOpen, setAuthDialogOpen] = useState(false);
-
-  console.log("trip dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", tripData)
 
 
   const seatPricing = tripData?.seatPricing || [];

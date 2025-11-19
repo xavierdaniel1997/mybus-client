@@ -58,12 +58,18 @@ export default function Home() {
     }
   };
 
-  const availableSeats = (trip: TripData) =>
-    trip.seatPricing.filter((s) => !s.isBooked).length;
+  // const availableSeats = (trip: TripData) =>
+  //   trip.seatPricing.filter((s) => !s.isBooked).length;
 
-  /* Helper – format duration (optional) */
+  type SeatPricing = { type?: string; isBooked?: boolean };
+
+    const availableSeats = (trip: TripData) =>
+  trip.seatPricing.filter(
+    (s) => s.seatId !== "Aisle" && s.isBooked === false
+  ).length;
+
+
   const formatDuration = (str: string) => {
-    // "10 hours 42 mins" → "10h 42m"
     return str.replace("hours", "h").replace("mins", "m");
   };
 

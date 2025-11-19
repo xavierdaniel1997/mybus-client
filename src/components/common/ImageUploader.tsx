@@ -77,6 +77,7 @@ export default function ImageUploader({
         {existingImages.map((url, idx) => (
           <div key={`existing-${idx}`} className="relative group border rounded-md overflow-hidden">
             <Image 
+            unoptimized
             width={0}
               height={0} src={url} alt={`existing-${idx}`} className="object-cover  w-200 h-40" />
             <button

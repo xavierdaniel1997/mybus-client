@@ -170,12 +170,6 @@ export default function BusRoute() {
           Back
         </button>
         {currentStep < steps.length - 1 ? (
-          // <button
-          //   onClick={handleNext}
-          //   className="px-6 py-1 bg-blue-600 text-white rounded-md"
-          // >
-          //   {currentStep === 0 ? "Save & Next" : "Next"}
-          // </button>
           <button
             onClick={handleNext}
             className="px-6 py-1.5 bg-blue-600 text-white rounded-md"

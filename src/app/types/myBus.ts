@@ -34,7 +34,7 @@ export interface IBus {
   information?: string;
   features: IBusFeatures;
   images: string[];
-  leftCols: number;
+  leftCols: number; 
   leftRows: number;
   rightCols: number;
   rightRows: number;

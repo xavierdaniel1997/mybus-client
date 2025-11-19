@@ -91,7 +91,7 @@ export default function SeatGrid({
   
 
   const getSizeClasses = (seatType: string) => {
-    if (seatType === "seater") return isUser ? "w-12 h-20" : "w-8 h-8";
+    if (seatType === "seater") return isUser ? "w-12 h-20" : "w-9 h-10";
     return isUser ? "w-12 h-20" : "w-10 h-16";
   };
 

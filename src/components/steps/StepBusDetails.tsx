@@ -1,26 +1,17 @@
 "use client";
 
-import {BusLayout} from "@/app/types/bus";
-import {api} from "@/lib/api";
-import {handleApiError} from "@/lib/utils/handleApiError";
-import {forwardRef, JSX, useEffect, useImperativeHandle, useState} from "react";
+import { BusLayout } from "@/app/types/bus";
+import { api } from "@/lib/api";
+import { handleApiError } from "@/lib/utils/handleApiError";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import SeatGrid from "../SeatLayout/SeatGrid";
 import ImageUploader from "../common/ImageUploader";
 import SeatTypeLegend from "../SeatLayout/SeatTypeLegend";
-import {
-  FaWifi,
-  FaChargingStation,
-  FaBottleWater,
-  FaBed,
-  FaCookieBite,
-  FaLightbulb,
-  FaVideo,
-  FaBus,
-} from "react-icons/fa6";
-import {GiPillow} from "react-icons/gi";
-import {toast} from "sonner";
-import {BusDetails, StepBusDetailsRef} from "@/app/types/addBusType";
+import { FaBus } from "react-icons/fa6";
+import { toast } from "sonner";
+import { BusDetails, StepBusDetailsRef } from "@/app/types/addBusType";
 import { featureIcons } from "../bus/FeatureIcons";
+import { IBus } from "@/app/types/myBus";
 
 interface StepBusDetailsProps {
   busDetails: BusDetails;
@@ -30,22 +21,24 @@ interface StepBusDetailsProps {
 }
 
 const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
-  ({busDetails, setBusDetails, busId, setBusId}, ref) => {
+  ({ busDetails, setBusDetails, busId, setBusId }, ref) => {
     const [busLayout, setBusLayout] = useState<BusLayout[]>([]);
     const [selectLayout, setSelectLayout] = useState<BusLayout | null>(null);
     const [busImages, setBusImages] = useState<File[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    // const featureIcons: Record<string, JSX.Element> = {
-    //   wifi: <FaWifi className="text-blue-500 text-xl" />,
-    //   chargingPoint: <FaChargingStation className="text-yellow-500 text-xl" />,
-    //   waterBottle: <FaBottleWater className="text-blue-400 text-xl" />,
-    //   blankets: <FaBed className="text-purple-500 text-xl" />,
-    //   snacks: <FaCookieBite className="text-orange-500 text-xl" />,
-    //   readingLight: <FaLightbulb className="text-amber-400 text-xl" />,
-    //   cctv: <FaVideo className="text-red-500 text-xl" />,
-    //   pillow: <GiPillow className="text-pink-400 text-xl" />,
-    // };
+    // NEW
+    const [buses, setBuses] = useState<IBus[]>([]);
+    const [selectedExistingBusId, setSelectedExistingBusId] = useState<string | null>(null);
+
+    const getAllBuses = async () => {
+      try {
+        const response = await api.get("/mybus/all-buses");
+        setBuses(response.data.buses || []);
+      } catch (error) {
+        handleApiError(error);
+      }
+    };
 
     const getSeatingLayout = async () => {
       try {
@@ -55,37 +48,29 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
         handleApiError(error);
       }
     };
+
     useEffect(() => {
       getSeatingLayout();
+      getAllBuses();
     }, []);
 
-    // handle text input
-    const handleChange = (
-      e: React.ChangeEvent<
-        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-      >
-    ) => {
-      const {name, value} = e.target;
-      setBusDetails((prev) => ({...prev, [name]: value}));
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+      setBusDetails((prev) => ({ ...prev, [name]: value }));
     };
 
-    // Toggle every feature on/off
-    const areAllFeaturesEnabled = Object.values(
-      busDetails.features || {}
-    ).every(Boolean);
+    const areAllFeaturesEnabled = Object.values(busDetails.features || {}).every(Boolean);
 
     const handleSelectAllChange = () => {
       setBusDetails((prev) => {
         const features = prev.features || {};
-        // build a new features object preserving the exact feature keys expected by BusDetails
         const newFeatures = Object.fromEntries(
           Object.keys(features).map((key) => [key, !areAllFeaturesEnabled])
         ) as BusDetails["features"];
-        return {...prev, features: newFeatures};
+        return { ...prev, features: newFeatures };
       });
     };
 
-    // handle checkbox
     const handleFeatureChange = (feature: string) => {
       setBusDetails((prev) => ({
         ...prev,
@@ -96,10 +81,10 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
       }));
     };
 
-    // handle form submission
     const saveBus = async (): Promise<boolean> => {
       try {
         setIsLoading(true);
+
         const formData = new FormData();
         formData.append("name", busDetails.name);
         formData.append("registrationNo", busDetails.registrationNo);
@@ -109,32 +94,28 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
         formData.append("information", busDetails.information);
         formData.append("features", JSON.stringify(busDetails.features));
 
-        // append images
-        busImages.forEach((file) => {
-          formData.append("images", file);
-        });
+        busImages.forEach((file) => formData.append("images", file));
 
         let response;
-
-        // ✅ Check if busId exists -> update, else create
         if (busId) {
           response = await api.put(`/mybus/update-bus/${busId}`, formData, {
-            headers: {"Content-Type": "multipart/form-data"},
+            headers: { "Content-Type": "multipart/form-data" },
           });
-          toast.success("Bus details updated successfully");
+          toast.success("Bus updated");
         } else {
-          response = await api.post("/mybus/add-new-bus", formData, {
-            headers: {"Content-Type": "multipart/form-data"},
+          response = await api.post(`/mybus/add-new-bus`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
           });
-          toast.success("Bus created successfully");
+          toast.success("Bus created");
         }
 
         const id = response.data?.data?._id || busId || true;
         return id;
       } catch (error) {
-        setIsLoading(false);
         handleApiError(error);
         return false;
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -144,99 +125,145 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
 
     useEffect(() => {
       const fetchBusDetails = async () => {
-        if (busId) {
-          const response = await api.get(`/mybus/get-bus/${busId}`);
-          console.log("response from get bus details..............", response);
+        if (!busId) return;
 
-          const busData = response.data.data;
-          setBusDetails(busData);
+        const response = await api.get(`/mybus/get-bus/${busId}`);
+        const busData = response.data.data;
+        setBusDetails(busData);
 
-          // ✅ If busLayout already loaded, find and set the layout
-          if (busLayout.length > 0) {
-            const selected = busLayout.find(
-              (layout) =>
-                layout.name === busData.layoutName ||
-                layout._id === busData.layoutId
-            );
-            if (selected) setSelectLayout(selected);
-          }
+        if (busLayout.length > 0) {
+          const selected = busLayout.find(
+            (layout) => layout._id === busData.layoutId || layout.name === busData.layoutName
+          );
+          if (selected) setSelectLayout(selected);
         }
       };
       fetchBusDetails();
     }, [busId, busLayout]);
 
-    const handleLayoutSelect = (id: string) => {
-      const layout = busLayout.find((layout) => layout._id === id);
-      setSelectLayout(layout || null);
-      setBusDetails((prev) => ({
-        ...prev,
-        layoutId: id,
-      }));
+    // NEW: Handle selecting existing bus
+    const handleExistingBusSelect = (id: string) => {
+
+      if (id === "__new") {
+    setSelectedExistingBusId(null);
+    setBusId(null);
+
+    // Reset fields to empty values
+    setBusDetails({
+      name: "",
+      registrationNo: "",
+      brand: "",
+      busType: "",
+      layoutId: "",
+      information: "",
+      features: Object.fromEntries(
+        Object.keys(busDetails.features).map((f) => [f, false])
+      ),
+      images: []
+    });
+
+    setSelectLayout(null);
+    return;
+  }
+      setSelectedExistingBusId(id);
+      setBusId(id);
+
+      const selectedBus = buses.find((b) => b._id === id);
+      if (!selectedBus) return;
+
+      // setBusDetails({
+      //   ...busDetails,
+      //   ...selectedBus,
+      // });
+      
+
+      // console.log("checking the selectedBus details....", selectedBus, "and busLayout", busLayout)
+
+      // const selectedLayout = busLayout.find((l) => l._id === selectedBus.layoutId);
+      // console.log("selectedLayout................", selectLayout)
+      // if (selectedLayout) setSelectLayout(selectedLayout);
     };
 
+    const countSeats = (deck?: { type: string }[][]) =>
+      deck?.flat()?.filter((s) => s.type !== "Aisle")?.length || 0;
+
     const totalSeats =
-      (selectLayout?.lowerDeck?.reduce((sum, row) => sum + row.length, 0) ||
-        0) +
-      (selectLayout?.upperDeck?.reduce((sum, row) => sum + row.length, 0) || 0);
+      countSeats(selectLayout?.lowerDeck) + countSeats(selectLayout?.upperDeck);
 
     return (
       <div className="flex bg-gray-100/70 rounded-md px-8 py-5 gap-10 text-gray-600">
+
+        {/* LEFT PANEL */}
         <div className="space-y-3 flex-1/2">
-          <h3>Details</h3>
-          {/* Bus Name */}
+
+          {/* NEW: Select existing bus */}
           <div>
-            <div className="flex flex-col mb-1">
-              <label className="text-sm text-gray-600">Bus Name</label>
-            </div>
+            <label className="text-sm text-gray-600">Select Existing Bus</label>
+            <select
+              className="w-full border rounded-sm py-1.5 px-1 mt-1"
+              value={selectedExistingBusId || ""}
+              onChange={(e) => handleExistingBusSelect(e.target.value)}
+            >
+              <option value="__new">➕ Create New Bus</option>
+              <option value="">Choose a bus</option>
+              {buses.map((bus) => (
+                <option key={bus._id} value={bus._id}>
+                  {bus.name} — {bus.registrationNo}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {selectedExistingBusId && (
+            <p className="text-sm text-blue-700 font-medium">
+              Selected Bus: {buses.find(b=>b._id===selectedExistingBusId)?.name}
+            </p>
+          )}
+
+          {/* Name */}
+          <div>
+            <label className="text-sm text-gray-600">Bus Name</label>
             <input
               name="name"
               value={busDetails.name}
               onChange={handleChange}
-              type="text"
-              className="w-full border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
+              className="w-full border rounded-sm py-1.5 px-1"
               placeholder="Bus name"
             />
           </div>
 
-          {/* Bus Registration No */}
+          {/* Registration */}
           <div>
-            <div className="flex flex-col mb-1">
-              <label className="text-sm text-gray-600">Registration</label>
-            </div>
+            <label className="text-sm text-gray-600">Registration</label>
             <input
               name="registrationNo"
               value={busDetails.registrationNo}
               onChange={handleChange}
-              type="text"
-              className="w-full border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
-              placeholder="xxxxxx"
+              className="w-full border rounded-sm py-1.5 px-1"
+              placeholder="KL-07-XXX"
             />
           </div>
 
           {/* Brand */}
           <div>
-            <div className="flex flex-col mb-1">
-              <label className="text-sm text-gray-600">Vehile Brand</label>
-            </div>
+            <label className="text-sm text-gray-600">Vehicle Brand</label>
             <input
-              type="text"
               name="brand"
               value={busDetails.brand}
               onChange={handleChange}
-              className="w-full border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
+              className="w-full border rounded-sm py-1.5 px-1"
               placeholder="Volvo"
             />
           </div>
 
+          {/* Bus Type */}
           <div>
-            <div className="flex flex-col mb-1">
-              <label className="text-sm text-gray-600">Bus Type</label>
-            </div>
+            <label className="text-sm text-gray-600">Bus Type</label>
             <select
               name="busType"
               value={busDetails.busType}
               onChange={handleChange}
-              className="w-full border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
+              className="w-full border rounded-sm py-1.5 px-1"
             >
               <option value="">Select bus type</option>
               <option value="sleeper">Sleeper</option>
@@ -245,18 +272,23 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
             </select>
           </div>
 
+          {/* Layout */}
           <div>
-            <div className="flex flex-col mb-1">
-              <label className="text-sm text-gray-600">Seating Layout</label>
-            </div>
+            <label className="text-sm text-gray-600">Seating Layout</label>
             <select
-              className="w-full border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
               name="layoutId"
               value={busDetails.layoutId}
-              onChange={(e) => handleLayoutSelect(e.target.value)}
+              onChange={(e) => {
+  const layoutId = e.target.value;
+  setBusDetails(prev => ({ ...prev, layoutId }));
+  const selected = busLayout.find(l => l._id === layoutId);
+  setSelectLayout(selected || null);
+}}
+
+              className="w-full border rounded-sm py-1.5 px-1"
             >
-              <option>select layout</option>
-              {busLayout.map((layout: BusLayout) => (
+              <option>Select layout</option>
+              {busLayout.map((layout) => (
                 <option key={layout._id} value={layout._id}>
                   {layout.name}
                 </option>
@@ -264,38 +296,34 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
             </select>
           </div>
 
+          {/* Features */}
           <h3>Features</h3>
 
-          {/* Selected Feature Icons Container */}
-
-          <label className="flex items-center gap-2 text-sm text-gray-600 font-medium">
+          <label className="flex items-center gap-2 text-sm text-gray-600">
             <input
               type="checkbox"
               checked={areAllFeaturesEnabled}
               onChange={handleSelectAllChange}
-              className="h-4 w-4 border rounded-sm"
+              className="h-4 w-4"
             />
             Select All
           </label>
 
-          {Object.entries(busDetails.features).some(([_, value]) => value) && (
-            <div className="">
-              <h3 className="text-gray-700 text-sm font-semibold mb-2">
-                Selected Features
-              </h3>
+          {Object.entries(busDetails.features).some(([_, v]) => v) && (
+            <div>
+              <h3 className="text-sm mb-2">Selected Features</h3>
               <div className="flex flex-wrap gap-4">
-                {Object.entries(busDetails.features).map(([feature, value]) =>
-                  value ? (
-                    <div
-                      key={feature}
-                      className="flex items-center gap-2 px-3 py-2 border rounded-lg bg-gray-50 hover:bg-gray-100 transition"
-                    >
-                      {featureIcons[feature]}
-                      <span className="text-gray-700 text-sm capitalize">
-                        {feature.replace(/([A-Z])/g, " $1")}
-                      </span>
-                    </div>
-                  ) : null
+                {Object.entries(busDetails.features).map(
+                  ([feature, value]) =>
+                    value && (
+                      <div
+                        key={feature}
+                        className="flex items-center gap-2 px-3 py-2 border rounded-lg bg-gray-50"
+                      >
+                        {featureIcons[feature]}
+                        <span className="text-sm">{feature}</span>
+                      </div>
+                    )
                 )}
               </div>
             </div>
@@ -303,86 +331,70 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
 
           <div className="flex flex-wrap gap-4">
             {Object.entries(busDetails.features).map(([feature, value]) => (
-              <label
-                key={feature}
-                className="flex items-center gap-2 text-sm text-gray-600"
-              >
+              <label key={feature} className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
                   checked={value}
                   onChange={() => handleFeatureChange(feature)}
-                  className="h-4 w-4 border rounded-sm"
                 />
-                {feature.charAt(0).toUpperCase() +
-                  feature.slice(1).replace(/([A-Z])/g, " $1")}
+                {feature}
               </label>
             ))}
           </div>
 
+          {/* Info */}
           <div>
-            <div className="flex flex-col mb-1">
-              <label className="text-sm text-gray-600">Information</label>
-            </div>
+            <label className="text-sm text-gray-600">Information</label>
             <textarea
               name="information"
               value={busDetails.information}
               onChange={handleChange}
-              className="w-full border rounded-sm py-1.5 px-1 focus:ring focus:ring-blue-500 outline-none"
-              placeholder="New Bus"
+              className="w-full border rounded-sm py-1.5 px-1"
               rows={3}
             />
           </div>
-
-          {/*left section end  */}
         </div>
-        {/* right section */}
+
+        {/* RIGHT PANEL */}
         <div className="space-y-3 flex-1/2">
           <div>
-            <h3 className="mb-2">Drag and drop the images of bus</h3>
-            <div>
-              <ImageUploader
-                onChange={(files) => setBusImages(files)}
-                busImages={busDetails?.images || []}
-              />
-            </div>
+            <h3 className="mb-2">Drag and drop bus images</h3>
+            <ImageUploader
+              onChange={(files) => setBusImages(files)}
+              busImages={busDetails?.images || []}
+            />
           </div>
 
-          {/* show selected layout */}
           <div className="flex gap-10">
             {selectLayout?.lowerDeck && (
               <div>
                 <p className="text-center mb-1">Lower deck</p>
-                <SeatGrid
-                  layout={selectLayout?.lowerDeck}
-                  isUpperDeck={false}
-                />
+                <SeatGrid layout={selectLayout.lowerDeck} isUpperDeck={false} />
               </div>
             )}
+
             {selectLayout?.upperDeck && selectLayout.upperDeck.length > 0 && (
               <div>
                 <p className="text-center mb-1">Upper deck</p>
-                <SeatGrid layout={selectLayout?.upperDeck} isUpperDeck={true} />
+                <SeatGrid layout={selectLayout.upperDeck} isUpperDeck={true} />
               </div>
             )}
           </div>
         </div>
 
-        {/* last row */}
+        {/* FOOTER */}
         <div className="flex flex-col justify-between">
           <SeatTypeLegend totalSeat={totalSeats} />
-          <div>
-            {isLoading && (
-              <button
-                className="bg-blue-600 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-gray-50 min-w-[120px] transition hover:bg-blue-700 disabled:opacity-70"
-                disabled={isLoading}
-              >
-                <div className="flex items-center gap-2">
-                  <FaBus className="text-white text-xl animate-busRun" />
-                  <span>Uploading...</span>
-                </div>
-              </button>
-            )}
-          </div>
+
+          {isLoading && (
+            <button
+              className="bg-blue-600 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-white min-w-[120px]"
+              disabled
+            >
+              <FaBus className="text-xl animate-busRun" />
+              Uploading...
+            </button>
+          )}
         </div>
       </div>
     );
