@@ -1,7 +1,6 @@
 "use client";
 
 import { IBus } from "@/app/types/myBus";
-import BusInfoModal from "@/components/bus/BusInfoModal";
 import ReusableTable from "@/components/common/ReusableTable";
 import { Dialog} from "@/components/ui/dialog";
 import { api } from "@/lib/api";
@@ -12,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaBus } from "react-icons/fa6";
 import { MdDeleteOutline, MdEdit, MdMoreVert } from "react-icons/md";
+import BookingInfoModal from "@/components/tripBooking/BookingInfoModal";
 
 interface Row {
   [key: string]: React.ReactNode;
@@ -27,7 +27,7 @@ const columns = [
   { label: "Actions", field: "actions" },
 ];
 
-export default function Buses() {
+export default function BookingDetails() {
   const [buses, setBuses] = useState<IBus[]>();
   const router = useRouter();
  const [isBusInfoOpen, setIsBusInfoOpen] = useState(false);
@@ -71,22 +71,10 @@ const openBusModal = (busId: string) => {
       brand: bus.brand,
       layoutName: bus.layoutName,
       actions: (
-        <div className="flex space-x-3">
-          <MdEdit
-            className="text-gray-500 cursor-pointer text-xl"
-            // onClick={() => handleEditLocation(location.id)}
-            aria-label={`Edit location ${bus.name}`}
-          />
-          <MdDeleteOutline
-            className="text-gray-500 cursor-pointer text-xl"
-            //  onClick={() => handleDeleteLocation(location._id)}
-            aria-label={`Delete location ${bus.name}`}
-          />
-         <MdMoreVert
-      className="text-gray-500 cursor-pointer text-xl"
-      onClick={() => openBusModal(bus._id)}
-    />
-        </div>
+        <button className="flex space-x-3 cursor-pointer"
+        onClick={() => openBusModal(bus._id)}>
+         Show Details
+        </button>
       ),
     })) || [];
 
@@ -140,7 +128,7 @@ const openBusModal = (busId: string) => {
       </div>
       <Dialog open={isBusInfoOpen} onOpenChange={setIsBusInfoOpen}>
   {selectedBusId && (
-    <BusInfoModal
+    <BookingInfoModal
       busId={selectedBusId}
       close={() => setIsBusInfoOpen(false)}
     />

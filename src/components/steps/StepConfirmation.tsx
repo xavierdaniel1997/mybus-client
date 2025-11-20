@@ -48,7 +48,7 @@ export default function StepConfirmation({
     }
   }, [tripInfo]);
 
-        console.log("checking the resposn of businfo routedescription................", routeInfo);
+
 
   return (
     <div className="bg-gray-100/90 rounded-md p-5">

@@ -1,3 +1,5 @@
+import { ITrip } from "./trip";
+
 export interface IBusSeat {
   id: string;
   type: "seater" | "sleeper" | "Aisle";
@@ -104,4 +106,12 @@ export interface IBusRoute {
   duration: string;                      // e.g. "10 hours 26 mins"
   boardingPoints: IRoutePoint[];         // pickup points
   droppingPoints: IRoutePoint[];         // drop-off points
+}
+
+
+export interface IBusDetailResponse {
+  bus: IBus;
+  routes: IBusRoute[];
+  schedules: IBusSchedule[];
+  trips: ITrip[];
 }

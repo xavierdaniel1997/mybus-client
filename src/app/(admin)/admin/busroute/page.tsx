@@ -10,7 +10,7 @@ import StepTripDetails, {
   StepTripSchedulerRef,
 } from "@/components/steps/StepTripDetails";
 import StepConfirmation from "@/components/steps/StepConfirmation";
-import {StepBusDetailsRef} from "@/app/types/addBusType";
+import {StepBusDetailsRef, BusDetails} from "@/app/types/addBusType";
 import {StepRouteDetailsRef} from "@/app/types/busroute";
 import {api} from "@/lib/api";
 import {handleApiError} from "@/lib/utils/handleApiError";
@@ -27,25 +27,25 @@ export default function BusRoute() {
   const [routeDetail, setRouteDetail] = useState(null);
 
   // ✅ Persistent bus data stored here
-  const [busId, setBusId] = useState<string | null>(null);
-  const [busDetails, setBusDetails] = useState({
-    name: "",
-    registrationNo: "",
-    brand: "",
-    busType: "",
-    layoutId: "",
-    information: "",
-    features: {
-      wifi: false,
-      chargingPoint: false,
-      waterBottle: false,
-      blankets: false,
-      snacks: false,
-      readingLight: false,
-      cctv: false,
-      pillow: false,
-    },
-  });
+    const [busId, setBusId] = useState<string | null>(null);
+    const [busDetails, setBusDetails] = useState<BusDetails>({
+      name: "",
+      registrationNo: "",
+      brand: "",
+      busType: "",
+      layoutId: "",
+      information: "",
+      features: {
+        wifi: false,
+        chargingPoint: false,
+        waterBottle: false,
+        blankets: false,
+        snacks: false,
+        readingLight: false,
+        cctv: false,
+        pillow: false,
+      },
+    });
 
   const steps = [
     <StepBusDetails
@@ -134,7 +134,7 @@ export default function BusRoute() {
     const response = await api.patch(`/mytrips/verify-trips/${scheduleId}`);
     if (response.status === 200) {
       toast.success(response.data.message)
-      router.push("/admin");
+      router.push("/admin/buses");
     } else {
       console.error("Verification failed:", response);
     }

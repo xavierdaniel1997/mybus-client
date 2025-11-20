@@ -17,7 +17,7 @@ close,
     close: () => void;
   seatId: string;
   bookingId: string;
-  onConfirm: () => void;
+  onConfirm: () => void; 
 }) {
   return (
     <DialogContent className="max-w-sm space-y-4">

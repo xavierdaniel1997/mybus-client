@@ -114,7 +114,7 @@ export default function BusTicketCard({ ticket, onCancelSuccess }: BusTicketCard
               </DialogTrigger>
 
               <CancelTicketModal
-              close={() => setOpenCancelModal(false)}
+              close={() => setOpenCancelModal(false)} 
                 seatId={seatId}
                 bookingId={ticket.bookingId}
                 onConfirm={handleCancelBooking}

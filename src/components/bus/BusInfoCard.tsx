@@ -5,7 +5,7 @@ import { featureIcons } from "./FeatureIcons";
 
 interface BusInfoCardProp{
     busInfo: IBus | null;
-    scheduleInfo: IBusSchedule | null;
+    scheduleInfo?: IBusSchedule | null;
 }
 
 export default function BusInfoCard({busInfo, scheduleInfo}: BusInfoCardProp){
