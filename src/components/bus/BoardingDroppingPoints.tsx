@@ -26,7 +26,7 @@ export default function BoardingDroppingPoints({boardingPoints, droppingPoints, 
   }, [tab, boardingPoints, droppingPoints, source, destination]);
 
   return (
-    <div className="min-w-sm max-w-lg mx-auto overflow-y-auto  max-h-[420px]  rounded-md border-2 border-gray-200 bg-white">
+    <div className="min-w-[45vh] max-w-lg mx-auto overflow-y-auto  max-h-[420px]  rounded-md border-2 border-gray-200 bg-white">
       <h2 className="font-semibold text-base mb-4 text-gray-900 px-8 pt-8">
         Boarding and Dropping Points
       </h2>

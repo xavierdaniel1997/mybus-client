@@ -34,14 +34,26 @@ interface Row {
   [key: string]: React.ReactNode;
 }
 
+// const columns = [
+//   { label: "BoardingPoint", field: "boardingPoint" },
+//   { label: "DroppingPoint", field: "droppingPoint" },
+//   { label: "Passenger Details", field: "passengerName" },
+//   { label: "Seat Id", field: "seat" },
+//   { label: "Phone", field: "phone" },
+//   { label: "Amount", field: "amount" },
+// ];
+
 const columns = [
-  { label: "BoardingPoint", field: "boardingPoint" },
-  { label: "DroppingPoint", field: "droppingPoint" },
-  { label: "Passenger Details", field: "passengerName" },
+  { label: "Boarding Point", field: "boardingPoint" },
+  { label: "Dropping Point", field: "droppingPoint" },
+  { label: "Passenger Name", field: "passengerName" },
+  { label: "Age", field: "age" },
+  { label: "Gender", field: "gender" },
   { label: "Seat Id", field: "seat" },
   { label: "Phone", field: "phone" },
   { label: "Amount", field: "amount" },
 ];
+
 
 export default function BookingInfoModal({ close, busId }: BookingModalProps) {
   const [bookingInfo, setBookingInfo] =
@@ -78,37 +90,56 @@ export default function BookingInfoModal({ close, busId }: BookingModalProps) {
     (trip) => new Date(trip.travelDate)
   );
 
-  const tableData: Row[] =
-    selectedTrip?.bookings.map((booking) => ({
-      boardingPoint: booking.boardingPoint.landmark,
-      droppingPoint: booking.droppingPoint.landmark,
-      passengerName: (
-        <div className="space-y-2">
-          {booking.passengers.map((passanger) => (
-            <div key={passanger.name}>
-              <p>{passanger.name}, {passanger.age}, {passanger.gender}</p>
-            </div>
-          ))}
-        </div>
-      ),
-      seat: (
-        <div className="space-y-2">
-          {booking.passengers.map((passanger) => (
-        <div key={passanger.seatId} className="flex items-center gap-5">
-          <p className="bg-gray-200 px-2 py-0.5 rounded font-semibold text-xs">
-            {passanger.seatId}
-          </p>
-        </div>
-      ))}
-        </div>
-      ),
-      phone: booking.contact.phone,
-      amount: booking.totalAmount,
-      status: booking.status,
-    })) || [];
+
+  // const tableData: Row[] =
+  //   selectedTrip?.bookings.map((booking) => ({
+  //     boardingPoint: booking.boardingPoint.landmark,
+  //     droppingPoint: booking.droppingPoint.landmark,
+  //     passengerName: (
+  //       <div className="space-y-2">
+  //         {booking.passengers.map((passanger) => (
+  //           <div key={passanger.name}>
+  //             <p>{passanger.name}, {passanger.age}, {passanger.gender}</p>
+  //           </div>
+  //         ))}
+  //       </div>
+  //     ),
+  //     seat: (
+  //       <div className="space-y-2">
+  //         {booking.passengers.map((passanger) => (
+  //       <div key={passanger.seatId} className="flex items-center gap-5">
+  //         <p className="bg-gray-200 px-2 py-0.5 rounded font-semibold text-xs">
+  //           {passanger.seatId}
+  //         </p>
+  //       </div>
+  //     ))}
+  //       </div>
+  //     ),
+  //     phone: booking.contact.phone,
+  //     amount: booking.totalAmount,
+  //     status: booking.status,
+  //   })) || [];
+
+
+  const tableData: Row[] = selectedTrip
+  ? selectedTrip.bookings.flatMap((booking) =>
+      booking.passengers.map((p) => ({
+        boardingPoint: booking.boardingPoint.landmark,
+        droppingPoint: booking.droppingPoint.landmark,
+        passengerName: p.name,
+        age: p.age,
+        gender: p.gender,
+        seat: <p className="bg-gray-200 px-1 py-0.5 rounded font-semibold text-xs text-center">{p.seatId}</p>,
+        phone: booking.contact.phone,
+        amount: selectedTrip.basePrice,
+      }))
+    )
+  : [];
+
+
 
   return (
-    <DialogContent className="!max-w-[153vh] max-h-[85vh] flex flex-col">
+    <DialogContent className="!max-w-[160vh] max-h-[85vh] flex flex-col">
       <DialogHeader>
         <DialogTitle>
           {bookingInfo?.bus.name} / {bookingInfo?.bus.registrationNo} /{" "}
