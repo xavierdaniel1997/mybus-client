@@ -83,7 +83,7 @@ const ReusableTable: React.FC<ReusableTableProps> = ({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="text-center py-4 text-gray-500"
+                  className="text-center italic py-4 text-gray-500"
                 >
                   No data available
                 </TableCell>

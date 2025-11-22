@@ -45,6 +45,7 @@ export interface IBus {
   upperDeck?: IBusDeck;
   createdAt?: string;
   updatedAt?: string;
+  routes?:IBusRoute[];
 }
 
 
@@ -114,4 +115,56 @@ export interface IBusDetailResponse {
   routes: IBusRoute[];
   schedules: IBusSchedule[];
   trips: ITrip[];
+}
+
+
+
+/* ---------------- PASSENGER ---------------- */
+export interface IPassenger {
+  name: string;
+  age: number;
+  gender: string;
+  seatId?: string;
+}
+
+/* ---------------- CONTACT INFO ---------------- */
+export interface IContactInfo {
+  phoneCode: string;
+  phone: string;
+  email: string;
+  state: string;
+  whatsappEnabled: boolean;
+}
+
+/* ---------------- SINGLE BOOKING ---------------- */
+export interface IBooking {
+  _id: string;
+  trip: string;
+  seatIds: string[];
+  passengers: IPassenger[];
+  contact: IContactInfo;
+  boardingPoint: IRoutePoint;
+  droppingPoint: IRoutePoint;
+  totalAmount: number;
+  status: "confirmed" | "cancelled" | "pending";
+  reservationUntil?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/* ---------------- TRIP WITH BOOKINGS ---------------- */
+export interface ITripWithBookings extends ITrip {
+  bookings: IBooking[];
+}
+
+/* ---------------- ROUTE + TRIPS ---------------- */
+export interface IRouteWithTrips {
+  route: IBusRoute;
+  trips: ITripWithBookings[];
+}
+
+/* ---------------- BOOKING DETAILS RESPONSE ---------------- */
+export interface IBookingDetailsResponse {
+  bus: IBus;
+  routes: IRouteWithTrips[];
 }

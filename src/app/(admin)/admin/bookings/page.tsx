@@ -23,6 +23,7 @@ const columns = [
   { label: "Registration No", field: "registrationNo" },
   { label: "Type", field: "busType" },
   { label: "Brand", field: "brand" },
+  {label: "Route", field: "route"},
   { label: "Layout", field: "layoutName" },
   { label: "Actions", field: "actions" },
 ];
@@ -69,11 +70,15 @@ const openBusModal = (busId: string) => {
       registrationNo: bus.registrationNo,
       busType: bus.busType,
       brand: bus.brand,
+      route: <div className="flex items-center">
+        <p>{bus.routes?.[0]?.routeName}</p>
+        {(bus.routes?.length ?? 0) > 0 ? "..." : ""}
+      </div>,
       layoutName: bus.layoutName,
       actions: (
         <button className="flex space-x-3 cursor-pointer"
         onClick={() => openBusModal(bus._id)}>
-         Show Details
+         Show Trip Details
         </button>
       ),
     })) || [];

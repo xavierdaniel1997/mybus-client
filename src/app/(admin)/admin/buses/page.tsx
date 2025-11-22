@@ -3,7 +3,7 @@
 import { IBus } from "@/app/types/myBus";
 import BusInfoModal from "@/components/bus/BusInfoModal";
 import ReusableTable from "@/components/common/ReusableTable";
-import { Dialog} from "@/components/ui/dialog";
+import { Dialog } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
 import { handleApiError } from "@/lib/utils/handleApiError";
 import { FiSearch } from "react-icons/fi";
@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaBus } from "react-icons/fa6";
 import { MdDeleteOutline, MdEdit, MdMoreVert } from "react-icons/md";
+import { HiSwitchHorizontal } from "react-icons/hi";
 
 interface Row {
   [key: string]: React.ReactNode;
@@ -23,6 +24,7 @@ const columns = [
   { label: "Registration No", field: "registrationNo" },
   { label: "Type", field: "busType" },
   { label: "Brand", field: "brand" },
+  { label: "Route", field: "route" },
   { label: "Layout", field: "layoutName" },
   { label: "Actions", field: "actions" },
 ];
@@ -30,21 +32,20 @@ const columns = [
 export default function Buses() {
   const [buses, setBuses] = useState<IBus[]>();
   const router = useRouter();
- const [isBusInfoOpen, setIsBusInfoOpen] = useState(false);
-const [selectedBusId, setSelectedBusId] = useState<string | null>(null);
-const [searchText, setSearchText] = useState<string>("")
+  const [isBusInfoOpen, setIsBusInfoOpen] = useState(false);
+  const [selectedBusId, setSelectedBusId] = useState<string | null>(null);
+  const [searchText, setSearchText] = useState<string>("");
 
-const openBusModal = (busId: string) => {
-  setSelectedBusId(busId);
-  setIsBusInfoOpen(true);
-};
-
+  const openBusModal = (busId: string) => {
+    setSelectedBusId(busId);
+    setIsBusInfoOpen(true);
+  };
 
   const getAllBuses = async (searchText?: string) => {
     try {
       const response = await api.get("/mybus/all-buses", {
-      params: searchText ? { search: searchText } : {}
-    });
+        params: searchText ? { search: searchText } : {},
+      });
       setBuses(response.data.buses || []);
     } catch (error) {
       handleApiError(error);
@@ -53,6 +54,8 @@ const openBusModal = (busId: string) => {
   useEffect(() => {
     getAllBuses();
   }, []);
+
+  console.log("bus details..............", buses);
 
   const tableData: Row[] =
     buses?.map((bus) => ({
@@ -69,6 +72,7 @@ const openBusModal = (busId: string) => {
       registrationNo: bus.registrationNo,
       busType: bus.busType,
       brand: bus.brand,
+      route: bus.routes?.[0]?.routeName,
       layoutName: bus.layoutName,
       actions: (
         <div className="flex space-x-3">
@@ -82,10 +86,10 @@ const openBusModal = (busId: string) => {
             //  onClick={() => handleDeleteLocation(location._id)}
             aria-label={`Delete location ${bus.name}`}
           />
-         <MdMoreVert
-      className="text-gray-500 cursor-pointer text-xl"
-      onClick={() => openBusModal(bus._id)}
-    />
+          <MdMoreVert
+            className="text-gray-500 cursor-pointer text-xl"
+            onClick={() => openBusModal(bus._id)}
+          />
         </div>
       ),
     })) || [];
@@ -108,24 +112,24 @@ const openBusModal = (busId: string) => {
           </button>
         </div>
       </div>
-    <div className="mt-3 w-full max-w-sm">
-  <div className="flex items-center overflow-hidden rounded-md border border-gray-300 shadow-sm bg-white">
-    
-    <input
-      type="text"
-      placeholder="Search Bus"
-      className="flex-1 px-3 py-2 outline-none text-sm italic"
-      value={searchText}
-      onChange={(e) => setSearchText(e.target.value)}
-    />
+      <div className="mt-3 w-full max-w-sm">
+        <div className="flex items-center overflow-hidden rounded-md border border-gray-300 shadow-sm bg-white">
+          <input
+            type="text"
+            placeholder="Search Bus"
+            className="flex-1 px-3 py-2 outline-none text-sm italic"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
 
-    <button className="flex items-center gap-2 bg-blue-500 px-4 py-2 text-white text-sm font-medium hover:bg-blue-600"
-    onClick={() => getAllBuses(searchText)}>
-      Search <FiSearch className="text-lg" />
-    </button>
-
-  </div>
-</div>
+          <button
+            className="flex items-center gap-2 bg-blue-500 px-4 py-2 text-white text-sm font-medium hover:bg-blue-600"
+            onClick={() => getAllBuses(searchText)}
+          >
+            Search <FiSearch className="text-lg" />
+          </button>
+        </div>
+      </div>
 
       <div className="mt-5">
         <ReusableTable
@@ -139,14 +143,13 @@ const openBusModal = (busId: string) => {
         />
       </div>
       <Dialog open={isBusInfoOpen} onOpenChange={setIsBusInfoOpen}>
-  {selectedBusId && (
-    <BusInfoModal
-      busId={selectedBusId}
-      close={() => setIsBusInfoOpen(false)}
-    />
-  )}
-</Dialog>
-
+        {selectedBusId && (
+          <BusInfoModal
+            busId={selectedBusId}
+            close={() => setIsBusInfoOpen(false)}
+          />
+        )}
+      </Dialog>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { FaBusAlt, FaRoute, FaMapMarkerAlt, FaStar } from "react-icons/fa";
 import RouteTimeLine from "../bus/RouteTimeLine";
 import dayjs from "dayjs";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
+import BusImageCarousel from "../bus/BusImageCarousel";
 
 export default function BusTripDetails() {
   const { tripData } = useTripBookingStore();
@@ -92,7 +93,7 @@ const scrollContainer = (direction: "left" | "right") => {
   </button>
 
   {/* Images wrapper */}
-  <div
+  {/* <div
     ref={imageScrollRef}
     className="flex overflow-x-hidden scroll-smooth gap-3 px-2"
   >
@@ -107,7 +108,9 @@ const scrollContainer = (direction: "left" | "right") => {
         className="object-cover rounded-xl"
       />
     ))}
-  </div>
+  </div> */}
+
+  <BusImageCarousel images={tripData?.bus.images || []} />
 
   {/* Right Button */}
   <button

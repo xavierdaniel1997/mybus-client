@@ -9,14 +9,17 @@ interface MiniCalendarProps {
   selectedDates: Date[];
   onDateSelect: (date: Date) => void;
   disabled?: boolean;
+  showHeading?: boolean;
 }
 
 export default function MiniCalendar({
   selectedDates,
   onDateSelect,
   disabled = false,
+  showHeading = true,
 }: MiniCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
+  const [activeDate, setActiveDate] = useState<Date | null>(null);
 
   const startOfMonth = currentMonth.startOf("month");
   const endOfMonth = currentMonth.endOf("month");
@@ -33,17 +36,31 @@ export default function MiniCalendar({
   const isSelected = (date: dayjs.Dayjs) =>
     selectedDates.some((d) => dayjs(d).isSame(date, "day"));
 
-  // const handleDateClick = (date: dayjs.Dayjs) => onDateSelect(date.toDate());
+    const isScheduled = (date: dayjs.Dayjs) =>
+    selectedDates.some((d) => dayjs(d).isSame(date, "day"));
+
+
+   const isActive = (date: dayjs.Dayjs) =>
+    activeDate && dayjs(activeDate).isSame(date, "day");
+
+  // const handleDateClick = (date: dayjs.Dayjs) => {
+  //   if (!disabled) onDateSelect(date.toDate());
+  // };
+
   const handleDateClick = (date: dayjs.Dayjs) => {
-    if (!disabled) onDateSelect(date.toDate());
-  };
+  if (!disabled) {
+    const jsDate = date.toDate();
+    setActiveDate(jsDate);
+    onDateSelect(jsDate);
+  }
+};
 
   return (
     <div>
-      <h3 className="font-semibold text mb-2">
+      {showHeading && <h3 className="font-semibold text mb-2">
         Scheduled Days
-      </h3>
-      <p className="w-full text-sm text-gray-500 mb-4">Select dates from the calendar</p>
+      </h3>}
+      {showHeading && <p className="w-full text-sm text-gray-500 mb-4">Select dates from the calendar</p>}
       <div className="w-[400px] h-[420px] border rounded-md p-3 shadow-sm">
         {/* Header */}
         <div className="flex justify-between items-center mb-3">
@@ -76,17 +93,28 @@ export default function MiniCalendar({
           {days.map((date) => {
             const inMonth = date.isSame(currentMonth, "month");
             const selected = isSelected(date);
+            const scheduled = isScheduled(date);
+            const active = isActive(date);
             return (
               <div
                 key={date.toString()}
                 onClick={() => handleDateClick(date)}
-                className={`cursor-pointer p-1.5 rounded-sm ${
-                  selected
-                    ? "bg-blue-600 text-white"
-                    : inMonth
-                    ? "hover:bg-blue-50 text-gray-800"
-                    : "text-gray-300"
-                }`}
+                  className={`cursor-pointer p-1.5 rounded-sm
+                  ${
+                    active ? "bg-red-500 text-white" : ""
+                  }  <!-- Selected by user -->
+                  ${
+                    !active && scheduled
+                      ? "bg-blue-600 text-white"
+                      : ""
+                  }  <!-- Scheduled trip date -->
+                  ${
+                    !active && !scheduled && inMonth
+                      ? "hover:bg-blue-50 text-gray-800"
+                      : ""
+                  } <!-- Normal days -->
+                  ${!inMonth ? "text-gray-300" : ""} <!-- Outside month -->
+                `}
               >
                 {date.date()}
               </div>

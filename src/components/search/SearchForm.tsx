@@ -73,14 +73,6 @@ export default function SearchForm({ onSearch }: Props) {
 };
 
 
-  //   const handleSwap = () => {
-  //   setFrom(prev => {
-  //     const old = prev;
-  //     setFrom(to);
-  //     setTo(old);
-  //     return to;
-  //   });
-  // };
 
   const handleSwap = () => {
   const temp = from;

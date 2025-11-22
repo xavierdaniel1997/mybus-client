@@ -7,7 +7,6 @@ interface RouteInfoCardProps{
 
 export default function RouteInfoCard({routeInfo}: RouteInfoCardProps){
 
-    console.log("route details form the route card", routeInfo)
     return(
         <div className="flex  gap-5  border-2 border-gray-200 rounded-md px-8 py-5">
             <div className="space-y-3">

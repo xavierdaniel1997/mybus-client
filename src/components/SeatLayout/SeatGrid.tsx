@@ -79,7 +79,6 @@ export default function SeatGrid({
   onSeatClick,
   selectedSeats,
 }: SeatGridProps) {
-  // seatId → price + isBooking map
   const priceMap = useMemo(() => {
     const map: Record<string, { price: number; isBooked: boolean }> = {};
     for (const p of seatPricing) {

@@ -81,7 +81,7 @@ export default function SeatSelection() {
                         layout={tripData?.bus.upperDeck?.seats}
                         isUpperDeck={true}
                         seatPricing={seatPricing}
-                    onSeatClick={handleSeatClick}
+                    onSeatClick={handleSeatClick} 
                     selectedSeats={selectedSeats}
                       />
                     </div>

@@ -67,7 +67,7 @@ export default function BusInfoCard({busInfo, scheduleInfo}: BusInfoCardProp){
 
                     <div>
                       {busInfo?.features && (
-                        <div className="mt-4 w-lg">
+                        <div className="mt-4 w-auto">
                           <h3 className="text-gray-700 text-sm font-semibold mb-2">
                             Features
                           </h3>
