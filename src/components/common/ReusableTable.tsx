@@ -48,7 +48,7 @@ const ReusableTable: React.FC<ReusableTableProps> = ({
     }
   };
 
-  return (
+  return ( 
     <div className="w-full">
       {/* Table Container */}
       <div className="border rounded-md shadow-sm overflow-x-auto">
