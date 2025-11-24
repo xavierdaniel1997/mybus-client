@@ -55,8 +55,6 @@ export default function Buses() {
     getAllBuses();
   }, []);
 
-  console.log("bus details..............", buses);
-
   const tableData: Row[] =
     buses?.map((bus) => ({
       image: (

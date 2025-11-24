@@ -91,36 +91,6 @@ export default function BookingInfoModal({ close, busId }: BookingModalProps) {
   );
 
 
-  // const tableData: Row[] =
-  //   selectedTrip?.bookings.map((booking) => ({
-  //     boardingPoint: booking.boardingPoint.landmark,
-  //     droppingPoint: booking.droppingPoint.landmark,
-  //     passengerName: (
-  //       <div className="space-y-2">
-  //         {booking.passengers.map((passanger) => (
-  //           <div key={passanger.name}>
-  //             <p>{passanger.name}, {passanger.age}, {passanger.gender}</p>
-  //           </div>
-  //         ))}
-  //       </div>
-  //     ),
-  //     seat: (
-  //       <div className="space-y-2">
-  //         {booking.passengers.map((passanger) => (
-  //       <div key={passanger.seatId} className="flex items-center gap-5">
-  //         <p className="bg-gray-200 px-2 py-0.5 rounded font-semibold text-xs">
-  //           {passanger.seatId}
-  //         </p>
-  //       </div>
-  //     ))}
-  //       </div>
-  //     ),
-  //     phone: booking.contact.phone,
-  //     amount: booking.totalAmount,
-  //     status: booking.status,
-  //   })) || [];
-
-
   const tableData: Row[] = selectedTrip
   ? selectedTrip.bookings.flatMap((booking) =>
       booking.passengers.map((p) => ({

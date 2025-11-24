@@ -3,13 +3,13 @@
 import { BusLayout } from "@/app/types/bus";
 import { api } from "@/lib/api";
 import { handleApiError } from "@/lib/utils/handleApiError";
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState, ChangeEvent } from "react";
 import SeatGrid from "../SeatLayout/SeatGrid";
 import ImageUploader from "../common/ImageUploader";
 import SeatTypeLegend from "../SeatLayout/SeatTypeLegend";
 import { FaBus } from "react-icons/fa6";
 import { toast } from "sonner";
-import { BusDetails, StepBusDetailsRef } from "@/app/types/addBusType";
+import { BusDetails, BusFeatures, StepBusDetailsRef } from "@/app/types/addBusType";
 import { featureIcons } from "../bus/FeatureIcons";
 import { IBus } from "@/app/types/myBus";
 
@@ -27,10 +27,22 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
     const [busImages, setBusImages] = useState<File[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    // NEW
     const [buses, setBuses] = useState<IBus[]>([]);
     const [selectedExistingBusId, setSelectedExistingBusId] = useState<string | null>(null);
 
+    // Default features
+    const defaultFeatures = {
+      wifi: false,
+      chargingPoint: false,
+      waterBottle: false,
+      blankets: false,
+      snacks: false,
+      readingLight: false,
+      cctv: false,
+      pillow: false,
+    };
+
+    // Fetch existing buses
     const getAllBuses = async () => {
       try {
         const response = await api.get("/mybus/all-buses");
@@ -40,6 +52,7 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
       }
     };
 
+    // Fetch seating layouts
     const getSeatingLayout = async () => {
       try {
         const response = await api.get("bustype/get-all-layouts");
@@ -54,34 +67,37 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
       getAllBuses();
     }, []);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    // Update fields
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       const { name, value } = e.target;
       setBusDetails((prev) => ({ ...prev, [name]: value }));
     };
 
-    const areAllFeaturesEnabled = Object.values(busDetails.features || {}).every(Boolean);
+    // Select all features
+    const areAllFeaturesEnabled = Object.values(busDetails.features ?? {}).every(Boolean);
 
     const handleSelectAllChange = () => {
-      setBusDetails((prev) => {
-        const features = prev.features || {};
-        const newFeatures = Object.fromEntries(
-          Object.keys(features).map((key) => [key, !areAllFeaturesEnabled])
-        ) as BusDetails["features"];
-        return { ...prev, features: newFeatures };
-      });
+      const toggled = !areAllFeaturesEnabled;
+      const newFeatures = Object.fromEntries(
+        Object.keys(defaultFeatures).map((key) => [key, toggled])
+      );
+      setBusDetails((prev) => ({ ...prev, features: newFeatures }));
     };
 
-    const handleFeatureChange = (feature: string) => {
-      setBusDetails((prev) => ({
-        ...prev,
-        features: {
-          ...prev.features,
-          [feature]: !prev.features[feature as keyof typeof prev.features],
-        },
-      }));
-    };
+    // Toggle individual feature
+   const handleFeatureChange = (feature: keyof BusFeatures) => {
+  setBusDetails((prev) => ({
+    ...prev,
+    features: {
+      ...prev.features,
+      [feature]: !prev.features?.[feature],
+    },
+  }));
+};
 
-    const saveBus = async (): Promise<boolean> => {
+
+    // Save bus (new or update)
+    const saveBus = async (): Promise<string | boolean> => {
       try {
         setIsLoading(true);
 
@@ -90,27 +106,22 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
         formData.append("registrationNo", busDetails.registrationNo);
         formData.append("brand", busDetails.brand);
         formData.append("busType", busDetails.busType);
-        formData.append("layoutId", busDetails.layoutId);
         formData.append("information", busDetails.information);
         formData.append("features", JSON.stringify(busDetails.features));
 
         busImages.forEach((file) => formData.append("images", file));
 
         let response;
+
         if (busId) {
-          response = await api.put(`/mybus/update-bus/${busId}`, formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          });
+          response = await api.put(`/mybus/update-bus/${busId}`, formData);
           toast.success("Bus updated");
         } else {
-          response = await api.post(`/mybus/add-new-bus`, formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          });
+          response = await api.post(`/mybus/add-new-bus`, formData);
           toast.success("Bus created");
         }
 
-        const id = response.data?.data?._id || busId || true;
-        return id;
+        return response.data?.data?._id || busId || "";
       } catch (error) {
         handleApiError(error);
         return false;
@@ -119,76 +130,88 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
       }
     };
 
+    // Expose createBus to parent
     useImperativeHandle(ref, () => ({
-      createBus: saveBus,
+      createBus: async () => {
+        if (selectedExistingBusId && !busId) return selectedExistingBusId;
+        return await saveBus();
+      },
     }));
 
-    useEffect(() => {
-      const fetchBusDetails = async () => {
-        if (!busId) return;
-
-        const response = await api.get(`/mybus/get-bus/${busId}`);
-        const busData = response.data.data;
-        setBusDetails(busData);
-
-        if (busLayout.length > 0) {
-          const selected = busLayout.find(
-            (layout) => layout._id === busData.layoutId || layout.name === busData.layoutName
-          );
-          if (selected) setSelectLayout(selected);
-        }
-      };
-      fetchBusDetails();
-    }, [busId, busLayout]);
-
-    // NEW: Handle selecting existing bus
-    const handleExistingBusSelect = (id: string) => {
-
-      if (id === "__new") {
-    setSelectedExistingBusId(null);
-    setBusId(null);
-
-    // Reset fields to empty values
-    setBusDetails({
-      name: "",
-      registrationNo: "",
-      brand: "",
-      busType: "",
-      layoutId: "",
-      information: "",
-      features: Object.fromEntries(
-        Object.keys(busDetails.features).map((f) => [f, false])
-      ),
-      images: []
+    // Normalize bus object
+    const normalizeBus = (data: Partial<IBus> = {}): BusDetails => ({
+      name: data.name || "",
+      registrationNo: data.registrationNo || "",
+      brand: data.brand || "",
+      busType: data.busType || "",
+      layoutId: "", // no longer used
+      information: data.information || "",
+      images: data.images || [],
+      features: {
+        ...defaultFeatures,
+        ...(data.features || {}),
+      },
     });
 
-    setSelectLayout(null);
-    return;
-  }
-      setSelectedExistingBusId(id);
-      setBusId(id);
-
-      const selectedBus = buses.find((b) => b._id === id);
-      if (!selectedBus) return;
-
-      // setBusDetails({
-      //   ...busDetails,
-      //   ...selectedBus,
-      // });
-      
-
-      // console.log("checking the selectedBus details....", selectedBus, "and busLayout", busLayout)
-
-      // const selectedLayout = busLayout.find((l) => l._id === selectedBus.layoutId);
-      // console.log("selectedLayout................", selectLayout)
-      // if (selectedLayout) setSelectLayout(selectedLayout);
+    const resetNew = () => {
+      setSelectedExistingBusId(null);
+      setBusId(null);
+      setSelectLayout(null);
+      setBusDetails(normalizeBus({}));
     };
 
+    // MAIN FIX: Load layout using layoutName
+    const handleExistingBusChange = (e: ChangeEvent<HTMLSelectElement>) => {
+      const value = e.target.value;
+
+      if (!value || value === "__new") {
+        resetNew();
+        return;
+      }
+
+      setSelectedExistingBusId(value);
+      setBusId(value);
+
+      const selected = buses.find((b) => b._id === value);
+      if (!selected) return;
+
+      const normalized = normalizeBus(selected);
+      setBusDetails(normalized);
+
+      // 1️⃣ Find layout by layoutName (case-insensitive)
+      const layoutByName = busLayout.find(
+        (l) =>
+          l.name.trim().toLowerCase() ===
+          (selected.layoutName || "").trim().toLowerCase()
+      );
+
+      if (layoutByName) {
+        setSelectLayout(layoutByName);
+        return;
+      }
+
+      // 2️⃣ Fallback: use embedded seating structure
+      if (selected.lowerDeck || selected.upperDeck) {
+        setSelectLayout({
+          _id: selected._id,
+          name: selected.layoutName,
+          lowerDeck: selected.lowerDeck?.seats || [],
+          upperDeck: selected.upperDeck?.seats || [],
+        } as unknown as BusLayout);
+        return;
+      }
+
+      setSelectLayout(null);
+    };
+
+    // Count seats
     const countSeats = (deck?: { type: string }[][]) =>
       deck?.flat()?.filter((s) => s.type !== "Aisle")?.length || 0;
 
     const totalSeats =
       countSeats(selectLayout?.lowerDeck) + countSeats(selectLayout?.upperDeck);
+
+    const isExisting = !!selectedExistingBusId;
 
     return (
       <div className="flex bg-gray-100/70 rounded-md px-8 py-5 gap-10 text-gray-600">
@@ -196,16 +219,15 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
         {/* LEFT PANEL */}
         <div className="space-y-3 flex-1/2">
 
-          {/* NEW: Select existing bus */}
+          {/* Existing bus select */}
           <div>
-            <label className="text-sm text-gray-600">Select Existing Bus</label>
+            <label className="text-sm">Select Existing Bus</label>
             <select
               className="w-full border rounded-sm py-1.5 px-1 mt-1"
               value={selectedExistingBusId || ""}
-              onChange={(e) => handleExistingBusSelect(e.target.value)}
+              onChange={handleExistingBusChange}
             >
               <option value="__new">➕ Create New Bus</option>
-              <option value="">Choose a bus</option>
               {buses.map((bus) => (
                 <option key={bus._id} value={bus._id}>
                   {bus.name} — {bus.registrationNo}
@@ -214,80 +236,75 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
             </select>
           </div>
 
-          {selectedExistingBusId && (
-            <p className="text-sm text-blue-700 font-medium">
-              Selected Bus: {buses.find(b=>b._id===selectedExistingBusId)?.name}
-            </p>
-          )}
-
           {/* Name */}
           <div>
-            <label className="text-sm text-gray-600">Bus Name</label>
+            <label className="text-sm">Bus Name</label>
             <input
               name="name"
+              disabled={isExisting}
               value={busDetails.name}
               onChange={handleChange}
-              className="w-full border rounded-sm py-1.5 px-1"
-              placeholder="Bus name"
+              className="w-full border rounded-sm py-1.5 px-1 disabled:bg-gray-200"
             />
           </div>
 
           {/* Registration */}
           <div>
-            <label className="text-sm text-gray-600">Registration</label>
+            <label className="text-sm">Registration</label>
             <input
               name="registrationNo"
+              disabled={isExisting}
               value={busDetails.registrationNo}
               onChange={handleChange}
-              className="w-full border rounded-sm py-1.5 px-1"
-              placeholder="KL-07-XXX"
+              className="w-full border rounded-sm py-1.5 px-1 disabled:bg-gray-200"
             />
           </div>
 
           {/* Brand */}
           <div>
-            <label className="text-sm text-gray-600">Vehicle Brand</label>
+            <label className="text-sm">Vehicle Brand</label>
             <input
+              disabled={isExisting}
               name="brand"
               value={busDetails.brand}
               onChange={handleChange}
-              className="w-full border rounded-sm py-1.5 px-1"
-              placeholder="Volvo"
+              className="w-full border rounded-sm py-1.5 px-1 disabled:bg-gray-200"
             />
           </div>
 
           {/* Bus Type */}
           <div>
-            <label className="text-sm text-gray-600">Bus Type</label>
+            <label className="text-sm">Bus Type</label>
             <select
+              disabled={isExisting}
               name="busType"
               value={busDetails.busType}
               onChange={handleChange}
-              className="w-full border rounded-sm py-1.5 px-1"
+              className="w-full border rounded-sm py-1.5 px-1 disabled:bg-gray-200"
             >
-              <option value="">Select bus type</option>
+              <option value="">Select type</option>
               <option value="sleeper">Sleeper</option>
               <option value="sleeper+seater">Sleeper + Seater</option>
               <option value="seater">Seater</option>
             </select>
           </div>
 
-          {/* Layout */}
+          {/* LAYOUT (NO LONGER USED FOR EXISTING) */}
           <div>
-            <label className="text-sm text-gray-600">Seating Layout</label>
+            <label className="text-sm">Seating Layout</label>
             <select
+              disabled={isExisting}
               name="layoutId"
               value={busDetails.layoutId}
               onChange={(e) => {
-  const layoutId = e.target.value;
-  setBusDetails(prev => ({ ...prev, layoutId }));
-  const selected = busLayout.find(l => l._id === layoutId);
-  setSelectLayout(selected || null);
-}}
-
-              className="w-full border rounded-sm py-1.5 px-1"
+                const id = e.target.value;
+                setBusDetails((p) => ({ ...p, layoutId: id }));
+                const layout = busLayout.find((l) => l._id === id);
+                setSelectLayout(layout || null);
+              }}
+              className="w-full border rounded-sm py-1.5 px-1 disabled:bg-gray-200"
             >
-              <option>Select layout</option>
+              <option value="">Select layout</option>
               {busLayout.map((layout) => (
                 <option key={layout._id} value={layout._id}>
                   {layout.name}
@@ -296,60 +313,42 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
             </select>
           </div>
 
-          {/* Features */}
-          <h3>Features</h3>
+          {/* FEATURES */}
+          <h3 className="font-semibold">Features</h3>
 
-          <label className="flex items-center gap-2 text-sm text-gray-600">
+          <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
+              disabled={isExisting}
               checked={areAllFeaturesEnabled}
               onChange={handleSelectAllChange}
-              className="h-4 w-4"
             />
             Select All
           </label>
 
-          {Object.entries(busDetails.features).some(([_, v]) => v) && (
-            <div>
-              <h3 className="text-sm mb-2">Selected Features</h3>
-              <div className="flex flex-wrap gap-4">
-                {Object.entries(busDetails.features).map(
-                  ([feature, value]) =>
-                    value && (
-                      <div
-                        key={feature}
-                        className="flex items-center gap-2 px-3 py-2 border rounded-lg bg-gray-50"
-                      >
-                        {featureIcons[feature]}
-                        <span className="text-sm">{feature}</span>
-                      </div>
-                    )
-                )}
-              </div>
-            </div>
-          )}
-
           <div className="flex flex-wrap gap-4">
-            {Object.entries(busDetails.features).map(([feature, value]) => (
-              <label key={feature} className="flex items-center gap-2 text-sm">
+            {(Object.entries(busDetails.features ?? {}) as [keyof BusFeatures, boolean][]).map(([f, v]) => (
+              <label key={f} className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
-                  checked={value}
-                  onChange={() => handleFeatureChange(feature)}
+                  disabled={isExisting}
+                  checked={v}
+                  onChange={() => handleFeatureChange(f)}
                 />
-                {feature}
+                {f}
               </label>
             ))}
           </div>
 
           {/* Info */}
           <div>
-            <label className="text-sm text-gray-600">Information</label>
+            <label className="text-sm">Information</label>
             <textarea
+              disabled={isExisting}
               name="information"
               value={busDetails.information}
               onChange={handleChange}
-              className="w-full border rounded-sm py-1.5 px-1"
+              className="w-full border rounded-sm py-1 px-1 disabled:bg-gray-200"
               rows={3}
             />
           </div>
@@ -358,7 +357,7 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
         {/* RIGHT PANEL */}
         <div className="space-y-3 flex-1/2">
           <div>
-            <h3 className="mb-2">Drag and drop bus images</h3>
+            <h3 className="mb-2">Upload images</h3>
             <ImageUploader
               onChange={(files) => setBusImages(files)}
               busImages={busDetails?.images || []}
@@ -368,14 +367,14 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
           <div className="flex gap-10">
             {selectLayout?.lowerDeck && (
               <div>
-                <p className="text-center mb-1">Lower deck</p>
+                <p className="text-center">Lower deck</p>
                 <SeatGrid layout={selectLayout.lowerDeck} isUpperDeck={false} />
               </div>
             )}
 
-            {selectLayout?.upperDeck && selectLayout.upperDeck.length > 0 && (
+            {selectLayout?.upperDeck && (
               <div>
-                <p className="text-center mb-1">Upper deck</p>
+                <p className="text-center">Upper deck</p>
                 <SeatGrid layout={selectLayout.upperDeck} isUpperDeck={true} />
               </div>
             )}
@@ -385,14 +384,12 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
         {/* FOOTER */}
         <div className="flex flex-col justify-between">
           <SeatTypeLegend totalSeat={totalSeats} />
-
           {isLoading && (
             <button
-              className="bg-blue-600 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-white min-w-[120px]"
+              className="bg-blue-600 text-white px-4 py-2 rounded flex gap-2 items-center"
               disabled
             >
-              <FaBus className="text-xl animate-busRun" />
-              Uploading...
+              <FaBus className="animate-busRun" /> Uploading...
             </button>
           )}
         </div>

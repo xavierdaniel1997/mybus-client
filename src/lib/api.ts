@@ -1,5 +1,5 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
-import { useAuthStore } from '@/app/(store)/useAuthStore';
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import { useAuthStore } from "@/app/(store)/useAuthStore";
 
 // Extend AxiosRequestConfig to include the custom _retry property
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
@@ -11,38 +11,74 @@ const API_URL = process.env.NEXT_PUBLIC_SERVER_ORIGIN;
 export const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
-  withCredentials: true, // Required for refresh token cookies, if used
+  withCredentials: true,
 });
+
+// Global refresh in-flight promise to avoid race conditions
+let refreshPromise: Promise<string | null> | null = null;
 
 // Function to refresh the access token
 const refreshAccessToken = async () => {
   try {
-    const response = await axios.post(`${API_URL}/auth/new-accesstoken`, {}, { withCredentials: true });
-    const { accessToken, expiresIn } = response.data; // Adjust based on your API response
-    useAuthStore.getState().setToken(accessToken, expiresIn || 15 * 60); // Default to 15 minutes if expiresIn not provided
+    const response = await axios.post(
+      `http://localhost:8000/api/auth/new-accesstoken`,
+      {},
+      { withCredentials: true }
+    );
+    console.log(
+      "the resposne of the refreshAccessToken#########################################",
+      response
+    );
+    const { accessToken, expiresIn } = response.data;
+    if (!accessToken) {
+      throw new Error("No accessToken in refresh response");
+    }
+    useAuthStore.getState().setToken(accessToken, expiresIn || 15 * 60);
     return accessToken;
   } catch (error) {
-    console.error('Failed to refresh token:', error);
-    useAuthStore.getState().clearAuth(); // Clear auth state on failure
-    window.location.href = '/'; // Redirect to login page
-    throw error;
+    console.error("Failed to refresh token:", error);
+    useAuthStore.getState().clearAuth(); 
+    window.location.href = "/"; 
+    return null;
   }
 };
 
-// Axios request interceptor to add token and handle refresh
+
 api.interceptors.request.use(
   async (config) => {
-    const { token, tokenExpiry } = useAuthStore.getState();
 
-    // Check if token exists and is expired
-    if (token && tokenExpiry && Date.now() >= tokenExpiry) {
-      // Token is expired, refresh it
-      const newToken = await refreshAccessToken();
-      config.headers.Authorization = `Bearer ${newToken}`;
-    } else if (token) {
-      // Token is valid, add it to headers
+     const { _hasHydrated } = useAuthStore.getState();
+    if (!_hasHydrated) {
+      await new Promise(resolve => {
+        const interval = setInterval(() => {
+          if (useAuthStore.getState()._hasHydrated) {
+            clearInterval(interval);
+            resolve(null);
+          }
+        }, 10);
+      });
+    }
+    
+    const { token, tokenExpiry } = useAuthStore.getState();
+    const isExpired = token && tokenExpiry && Date.now() >= tokenExpiry;
+    console.log("TOKEN: ", token);
+    console.log("EXPIRY: ", tokenExpiry);
+    console.log("IS EXPIRED:", isExpired);
+    if (isExpired) {
+      console.log("inside the isExpired statement", isExpired , "and", refreshPromise)
+      if (!refreshPromise) {
+        refreshPromise = refreshAccessToken().finally(() => {
+          refreshPromise = null;
+        });
+      }
+
+      const newToken = await refreshPromise;
+      if (newToken && config.headers) {
+        config.headers.Authorization = `Bearer ${newToken}`;
+      }
+    } else if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -53,22 +89,15 @@ api.interceptors.request.use(
   }
 );
 
-// Optional: Response interceptor to handle 401 errors
+
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as CustomAxiosRequestConfig; // Use extended type
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Prevent infinite loops
-      try {
-        const newToken = await refreshAccessToken();
-        if (!originalRequest.headers) {
-          originalRequest.headers = {};
-        }
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        return api(originalRequest); // Retry the original request with new token
-      } catch (refreshError) {
-        return Promise.reject(refreshError);
+    const status = error.response?.status;
+    if (status === 401) {
+      useAuthStore.getState().clearAuth();
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
       }
     }
     return Promise.reject(error);

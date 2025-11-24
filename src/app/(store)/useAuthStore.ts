@@ -1,17 +1,16 @@
+"use client";
 
-'use client';
-
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { IUser } from '../types/user';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { IUser } from "../types/user";
 
 interface AuthState {
   user: IUser | null;
   token: string | null;
   isAuthenticated: boolean;
-  tokenExpiry: number | null; // timestamp in ms
-  _hasHydrated: boolean; // internal flag to indicate persist finished
-  
+  tokenExpiry: number | null;
+  _hasHydrated: boolean;
+
   setAuth: (user: IUser, token: string, expiresIn?: number) => void;
   clearAuth: () => void;
   setToken: (token: string, expiresIn: number) => void;
@@ -28,7 +27,8 @@ export const useAuthStore = create<AuthState>()(
       _hasHydrated: false,
 
       setAuth: (user, token, expiresIn) => {
-        const expiry = Date.now() + ((expiresIn ?? 15 * 60) * 1000);
+        const ttlSeconds = expiresIn ?? 15 * 60; 
+        const expiry = Date.now() + ttlSeconds * 1000;
         set({
           user,
           token,
@@ -45,22 +45,28 @@ export const useAuthStore = create<AuthState>()(
           tokenExpiry: null,
         }),
 
-      setToken: (token, expiresIn) =>
+      setToken: (token, expiresIn) => {
+        const expiry = Date.now() + expiresIn * 1000;
         set({
           token,
-          tokenExpiry: Date.now() + expiresIn * 1000,
-        }),
+          tokenExpiry: expiry,
+        });
+      },
 
       setHasHydrated: (v) => set({ _hasHydrated: v }),
     }),
     {
-      name: 'auth-storage',
+      name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        user: state.user,
+        token: state.token,
+        tokenExpiry: state.tokenExpiry,
+        isAuthenticated: state.isAuthenticated,
+        _hasHydrated: state._hasHydrated,
+      }),
 
-      // called before/after rehydrate
       onRehydrateStorage: () => (state) => {
-        // state is the store's set/get; we can set the hydration flag after rehydrate.
-        // Delay a microtask to ensure persisted state applied before we set the flag.
         Promise.resolve().then(() => {
           state?.setHasHydrated?.(true);
         });

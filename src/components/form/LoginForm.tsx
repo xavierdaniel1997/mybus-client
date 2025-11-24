@@ -44,7 +44,8 @@ export default function LoginForm({closeDialog, tripId} : LoginFromProps) {
       toast.success(response.data.message)
       reset()
       closeDialog()
-      setAuth(response.data.user, response.data.accessToken)
+       const { user, accessToken, expiresIn } = response.data;
+       setAuth(user, accessToken, expiresIn);
       const targetRoute = response.data.user.role === "ADMIN" ? "/admin" : tripId ? `/trip/${tripId}` : "/";
       router.push(targetRoute);
       setTimeout(() => {
@@ -60,12 +61,6 @@ export default function LoginForm({closeDialog, tripId} : LoginFromProps) {
 
   return (
     <>
-    {/* {loading && (
-      <div className="">
-        <AppLoader />
-      </div>  
-    )} */}
-    {/* {loading && <AppLoader/>}   */}
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-center space-y-4">
       <div className="w-full">
         <label className="block text-sm text-gray-700 mb-1">Email</label>
