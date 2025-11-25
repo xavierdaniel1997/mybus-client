@@ -23,7 +23,7 @@ let refreshPromise: Promise<string | null> | null = null;
 const refreshAccessToken = async () => {
   try {
     const response = await axios.post(
-      `http://localhost:8000/api/auth/new-accesstoken`,
+      `${API_URL}/auth/new-accesstoken`,
       {},
       { withCredentials: true }
     );

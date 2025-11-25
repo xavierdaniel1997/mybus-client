@@ -5,7 +5,7 @@ export interface IUser {
   email: string;
   phone: number;
   role: string;
-  isValidated: boolean;
+  isValidate: boolean;
   isRegComplete: boolean;
   createdAt: string;
   updatedAt: string;
