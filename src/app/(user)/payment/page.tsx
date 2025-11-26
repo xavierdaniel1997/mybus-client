@@ -7,6 +7,7 @@ import TripSummaryPanel from "@/components/tripBooking/TripSummaryPanel";
 import { api } from "@/lib/api";
 import { useEffect } from "react";
 import { FiCreditCard, FiChevronRight } from "react-icons/fi";
+import { GrStripe } from "react-icons/gr";
 import { LuBanknote} from "react-icons/lu";
 import { MdOutlineContactMail } from "react-icons/md";
 import { SiRazorpay } from "react-icons/si";
@@ -52,67 +53,86 @@ export default function PaymentDetails() {
   );
 
 
-   // Load Razorpay Script
-  useEffect(() => {
+   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
     document.body.appendChild(script);
   }, []);
 
+   console.log("process.env.NEXT_PUBLIC_RAZORPAY_KEY", process.env.NEXT_PUBLIC_RAZORPAY_KEY)
+
+
   const openRazorpay = () => {
-    if (!razorpayOrder) {
-      console.error("Missing Razorpay order.");
-      return;
-    }
+  if (!razorpayOrder) {
+    toast.error("Unable to start payment: missing order.");
+    return;
+  }
 
-    if (!tripData?._id || selectedSeats.length === 0) {
-      console.error("Missing trip info or seats.");
-      return;
-    }
+  if (!tripData?._id || selectedSeats.length === 0) {
+    toast.error("Missing trip information or seat selection.");
+    return;
+  }
 
-    const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY!,
-      amount: razorpayOrder.amount,
-      currency: razorpayOrder.currency,
-      name: "Trip Booking",
-      description: "Bus Ticket Payment",
-      order_id: razorpayOrder.id,
+  if (!contact?.email || !contact?.phone) {
+     toast.error("Please provide valid contact details (Email & Phone)");
+     return;
+  }
 
-      handler: async (response: RazorpayHandlerResponse) => {
-        try {
-          const res = await api.post("/booking/verify-payment", {
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            bookingId: razorpayOrder.receipt,
-            tripId: tripData._id,
-            seatIds: selectedSeats,
-          });
+  const options = {
+    key: process.env.NEXT_PUBLIC_RAZORPAY_KEY!,
+    amount: razorpayOrder.amount,
+    currency: razorpayOrder.currency,
+    order_id: razorpayOrder.id,
+    name: "Trip Booking",
+    description: "Bus Ticket Payment",
 
-          if (res.data.success) {
-            resetBooking()
-            toast.success("Payment Success! Booking Confirmed.");
-            router.push("/booking")
+    prefill: {
+      name: passengers?.[0]?.name || "Traveler",
+      email: contact.email, 
+      contact: contact.phone,
+    },
 
-          } else {
-            toast.error("Payment verification failed.");
-          }
-        } catch (err) {
-          console.error("Verification error:", err);
-          alert("Server verification failed.");
+    handler: async (response: RazorpayHandlerResponse) => {
+      try {
+        const res = await api.post("/booking/verify-payment", {
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          bookingId: razorpayOrder.receipt,
+          tripId: tripData._id,
+          seatIds: selectedSeats,
+        });
+
+        if (res.data.success) {
+          resetBooking();
+          toast.success("Payment Success! Booking Confirmed.");
+          router.push("/booking");
+        } else {
+          toast.error("Payment verification failed.");
         }
-      },
-
-      theme: { color: "#1A73E8" },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+      } catch (err) {
+        console.error("Verification error:", err);
+        toast.error("Server verification failed. Please contact support.");
+      }
+    },
+    modal: {
+      ondismiss: () => {
+        toast.info("Payment cancelled");
+      }
+    },
+    theme: { color: "#1A73E8" },
   };
 
-
-
+  try {
+    const rzp = new window.Razorpay(options);
+    
+    rzp.open();
+  } catch (error) {
+    console.error("Razorpay initialization error:", error);
+    toast.error("Failed to open payment gateway");
+  }
+};
 
 
 
@@ -168,15 +188,20 @@ export default function PaymentDetails() {
           <SectionTitle title="Credit/Debit card" />
           <div className="flex justify-between items-center p-3">
             <div className="flex items-center gap-3">
-              <FiCreditCard size={20} />
+              <GrStripe size={20} />
               <div>
-                <p className="font-medium">Add credit/debit card</p>
+                <p className="font-medium">Strip</p>
                 <p className="text-xs text-gray-500">
                   VISA, MasterCard and more
                 </p>
               </div>
             </div>
-            <FiChevronRight />
+             <button
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition"
+              // onClick={}
+            >
+              Pay Now
+            </button>
           </div>
         </Card>
 

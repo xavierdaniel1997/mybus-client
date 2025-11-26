@@ -73,7 +73,6 @@ export default function Home() {
     return str.replace("hours", "h").replace("mins", "m");
   };
 
-  console.log("checking the checking availableSeats...", availableSeats)
   return (
     <section className="relative w-full bg-gray-100">
       {/* ===== Banner Section ===== */}

@@ -1,12 +1,9 @@
 "use client";
 
 import { useTripBookingStore } from "@/app/(store)/useTripBookingStore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ContactDetails from "../form/ContactDetails";
 import PassengerForm from "../form/PassengerForm";
-import RouteTimeLine from "../bus/RouteTimeLine";
-import dayjs from "dayjs";
-import { useAuthStore } from "@/app/(store)/useAuthStore";
 import { useForm } from "react-hook-form";
 import { PassengerFormValues } from "@/app/types/passangerFormValues";
 import { handleApiError } from "@/lib/utils/handleApiError";
@@ -53,7 +50,7 @@ export default function PassengerInfo() {
     
     const response = await api.post("/booking/reserve", {
       tripId: tripData?._id,
-      seatIds: selectedSeats,
+      seatIds: selectedSeats,  
       passengers: data.passengers,
       contact,
       seatPrice,

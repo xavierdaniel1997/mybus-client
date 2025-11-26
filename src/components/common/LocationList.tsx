@@ -21,8 +21,6 @@ export default function LocationList() {
         getLocations()
     }, [])
 
-    console.log("location info....", locationInfo)
-
 
     return (
         <div className="px-6 sm:px-10 lg:px-96 py-12  text-gray-800">

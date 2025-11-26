@@ -27,10 +27,10 @@ const refreshAccessToken = async () => {
       {},
       { withCredentials: true }
     );
-    console.log(
-      "the resposne of the refreshAccessToken#########################################",
-      response
-    );
+    // console.log(
+    //   "the resposne of the refreshAccessToken#########################################",
+    //   response
+    // );
     const { accessToken, expiresIn } = response.data;
     if (!accessToken) {
       throw new Error("No accessToken in refresh response");
@@ -63,11 +63,11 @@ api.interceptors.request.use(
     
     const { token, tokenExpiry } = useAuthStore.getState();
     const isExpired = token && tokenExpiry && Date.now() >= tokenExpiry;
-    console.log("TOKEN: ", token);
-    console.log("EXPIRY: ", tokenExpiry);
-    console.log("IS EXPIRED:", isExpired);
+    // console.log("TOKEN: ", token);
+    // console.log("EXPIRY: ", tokenExpiry);
+    // console.log("IS EXPIRED:", isExpired);
     if (isExpired) {
-      console.log("inside the isExpired statement", isExpired , "and", refreshPromise)
+      // console.log("inside the isExpired statement", isExpired , "and", refreshPromise)
       if (!refreshPromise) {
         refreshPromise = refreshAccessToken().finally(() => {
           refreshPromise = null;
