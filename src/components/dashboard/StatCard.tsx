@@ -2,9 +2,10 @@
 
 import { IconType } from "react-icons";
 
+
 interface StatCardProps {
   label: string;
-  value: number;
+  value?: number;
   trendColor?: string;
   change?: string;
   Icon?: IconType;

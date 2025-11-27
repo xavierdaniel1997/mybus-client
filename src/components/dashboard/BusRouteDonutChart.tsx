@@ -1,20 +1,22 @@
 "use client";
 
+import { BusCountByRoutes } from "@/app/types/dashboard";
+import generateColors from "@/lib/utils/generateColors";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
-// Dummy data
-const data = [
-  { route: "Trivandrum → Nagercoil", buses: 12 },
-  { route: "Nagercoil → Tirunelveli", buses: 7 },
-  { route: "Tirunelveli → Madurai", buses: 5 },
-  { route: "Madurai → Chennai", buses: 9 },
-  { route: "Chennai → Bangalore", buses: 4 },
-];
 
-const COLORS = ["#4C82F7", "#00C49F", "#FFB547", "#FF6B6B", "#845EC2"];
+export default function BusRouteDonutChart({totalRoutesInfo}: {totalRoutesInfo: BusCountByRoutes}) {
+;
 
-export default function BusRouteDonutChart() {
-  const total = data.reduce((sum, item) => sum + item.buses, 0);
+  const chartData = totalRoutesInfo.routes.map(r => {
+  const cleanRoute = r.routeName.trim();
+  return {
+    route: cleanRoute,
+    buses: r.busCount,
+    color: generateColors(cleanRoute)
+  };
+});
+
 
   return (
     <div className="w-full h-[350px] md:h-[385px] pl-4 pt-4 bg-white rounded-2xl shadow text-gray-600">
@@ -24,7 +26,7 @@ export default function BusRouteDonutChart() {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={data}
+              data={chartData}
               dataKey="buses"
               nameKey="route"
               cx="50%"
@@ -33,10 +35,10 @@ export default function BusRouteDonutChart() {
               outerRadius={120}
               paddingAngle={4}
             >
-              {data.map((entry, index) => (
+              {chartData.map((entry, index) => (
                 <Cell
                   key={`slice-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+                  fill={entry.color}
                 />
               ))}
             </Pie>
@@ -46,7 +48,7 @@ export default function BusRouteDonutChart() {
 
         {/* Center Label */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-          <p className="text-3xl font-bold">{total}</p>
+          <p className="text-3xl font-bold">{totalRoutesInfo.totalBuses}</p>
           <p className="text-sm text-gray-500">Total Buses</p>
         </div>
       </div>
