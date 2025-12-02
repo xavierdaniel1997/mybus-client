@@ -3,13 +3,23 @@
 import { BusLayout } from "@/app/types/bus";
 import { api } from "@/lib/api";
 import { handleApiError } from "@/lib/utils/handleApiError";
-import { forwardRef, useEffect, useImperativeHandle, useState, ChangeEvent } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+  ChangeEvent,
+} from "react";
 import SeatGrid from "../SeatLayout/SeatGrid";
 import ImageUploader from "../common/ImageUploader";
 import SeatTypeLegend from "../SeatLayout/SeatTypeLegend";
 import { FaBus } from "react-icons/fa6";
 import { toast } from "sonner";
-import { BusDetails, BusFeatures, StepBusDetailsRef } from "@/app/types/addBusType";
+import {
+  BusDetails,
+  BusFeatures,
+  StepBusDetailsRef,
+} from "@/app/types/addBusType";
 import { featureIcons } from "../bus/FeatureIcons";
 import { IBus } from "@/app/types/myBus";
 
@@ -28,7 +38,9 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
     const [isLoading, setIsLoading] = useState(false);
 
     const [buses, setBuses] = useState<IBus[]>([]);
-    const [selectedExistingBusId, setSelectedExistingBusId] = useState<string | null>(null);
+    const [selectedExistingBusId, setSelectedExistingBusId] = useState<
+      string | null
+    >(null);
 
     // Default features
     const defaultFeatures = {
@@ -68,13 +80,17 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
     }, []);
 
     // Update fields
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const handleChange = (
+      e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
       const { name, value } = e.target;
       setBusDetails((prev) => ({ ...prev, [name]: value }));
     };
 
     // Select all features
-    const areAllFeaturesEnabled = Object.values(busDetails.features ?? {}).every(Boolean);
+    const areAllFeaturesEnabled = Object.values(
+      busDetails.features ?? {}
+    ).every(Boolean);
 
     const handleSelectAllChange = () => {
       const toggled = !areAllFeaturesEnabled;
@@ -85,18 +101,56 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
     };
 
     // Toggle individual feature
-   const handleFeatureChange = (feature: keyof BusFeatures) => {
-  setBusDetails((prev) => ({
-    ...prev,
-    features: {
-      ...prev.features,
-      [feature]: !prev.features?.[feature],
-    },
-  }));
-};
-
+    const handleFeatureChange = (feature: keyof BusFeatures) => {
+      setBusDetails((prev) => ({
+        ...prev,
+        features: {
+          ...prev.features,
+          [feature]: !prev.features?.[feature],
+        },
+      }));
+    };
 
     // Save bus (new or update)
+    // const saveBus = async (): Promise<string | boolean> => {
+    //   try {
+    //     setIsLoading(true);
+
+    //     const formData = new FormData();
+    //     formData.append("name", busDetails.name);
+    //     formData.append("registrationNo", busDetails.registrationNo);
+    //     formData.append("brand", busDetails.brand);
+    //     formData.append("busType", busDetails.busType);
+    //     formData.append("information", busDetails.information);
+    //     formData.append("features", JSON.stringify(busDetails.features));
+
+    //     if (!busId && busDetails.layoutId) {
+    //       formData.append("layoutId", busDetails.layoutId);
+    //     }
+
+    //      formData.append("features", JSON.stringify(busDetails.features ?? {}));
+
+    //     busImages.forEach((file) => formData.append("images", file));
+
+    //     let response;
+
+    //     if (busId) {
+    //       response = await api.put(`/mybus/update-bus/${busId}`, formData);
+    //       toast.success("Bus updated");
+    //     } else {
+    //       response = await api.post(`/mybus/add-new-bus`, formData);
+    //       toast.success("Bus created");
+    //     }
+
+    //     return response.data?.data?._id || busId || "";
+    //   } catch (error) {
+    //     handleApiError(error);
+    //     return false;
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // };
+
     const saveBus = async (): Promise<string | boolean> => {
       try {
         setIsLoading(true);
@@ -107,21 +161,33 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
         formData.append("brand", busDetails.brand);
         formData.append("busType", busDetails.busType);
         formData.append("information", busDetails.information);
-        formData.append("features", JSON.stringify(busDetails.features));
+
+        // ✅ FIX 1: append layoutId when creating new bus
+        if (!busId && busDetails.layoutId) {
+          formData.append("layoutId", busDetails.layoutId);
+        }
+
+        // ✅ FIX 2: REMOVE DUPLICATE OR BAD JSON — append features only once
+        formData.append("features", JSON.stringify(busDetails.features ?? {}));
 
         busImages.forEach((file) => formData.append("images", file));
+        console.log("busImages before upload:", busImages);
+        for (const [k, v] of formData.entries()) {
+          console.log(k, v);
+        }
 
         let response;
-
         if (busId) {
           response = await api.put(`/mybus/update-bus/${busId}`, formData);
           toast.success("Bus updated");
         } else {
-          response = await api.post(`/mybus/add-new-bus`, formData);
+          response = await api.post(`/mybus/add-new-bus`, formData, {
+             headers: { "Content-Type": "multipart/form-data" },
+          });
           toast.success("Bus created");
         }
 
-        return response.data?.data?._id || busId || "";
+        return response.data?.data?._id || "";
       } catch (error) {
         handleApiError(error);
         return false;
@@ -215,10 +281,8 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
 
     return (
       <div className="flex bg-gray-100/70 rounded-md px-8 py-5 gap-10 text-gray-600">
-
         {/* LEFT PANEL */}
         <div className="space-y-3 flex-1/2">
-
           {/* Existing bus select */}
           <div>
             <label className="text-sm">Select Existing Bus</label>
@@ -327,7 +391,12 @@ const StepBusDetails = forwardRef<StepBusDetailsRef, StepBusDetailsProps>(
           </label>
 
           <div className="flex flex-wrap gap-4">
-            {(Object.entries(busDetails.features ?? {}) as [keyof BusFeatures, boolean][]).map(([f, v]) => (
+            {(
+              Object.entries(busDetails.features ?? {}) as [
+                keyof BusFeatures,
+                boolean
+              ][]
+            ).map(([f, v]) => (
               <label key={f} className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
