@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { FaBusAlt } from "react-icons/fa";
 import { BsArrowRight } from "react-icons/bs";
 import { BusFeatures } from "@/app/types/addBusType";
@@ -21,7 +22,7 @@ interface TripCardProps {
   discountText?: string;
 }
 
-export default function TripCard({
+const TripCard = ({
   busName,
   busType,
   information,
@@ -34,7 +35,7 @@ export default function TripCard({
   discountedPrice,
   features,
   discountText = "Exclusive ₹150 OFF",
-}: TripCardProps) {
+}: TripCardProps) => {
   return (
     <div className="border border-gray-200 rounded-xl p-4 sm:p-5 bg-white shadow-sm hover:shadow-md transition-all">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -105,4 +106,7 @@ export default function TripCard({
       </div>
     </div>
   );
-}
+};
+
+// Export memoized version to prevent unnecessary re-renders
+export default memo(TripCard);

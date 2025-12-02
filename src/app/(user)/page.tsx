@@ -3,78 +3,96 @@
 import Image from "next/image";
 import coverbanner from "../../../public/coverbanner.png";
 import SearchForm from "../../components/search/SearchForm";
-import CouponCard from "@/components/common/CouponCard";
-import couponsData from "../../data/couponsData.json";
-import { FaBusAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { GiWallet } from "react-icons/gi";
-import { MdCreditCard } from "react-icons/md";
-import { useState } from "react";
-import { JSX } from "react";
-import { Coupon } from "../types/coupon";
-import CouponList from "@/components/common/CouponList";
-import StatsBanner from "@/components/common/StatsBanner";
-import LocationList from "@/components/common/LocationList";
-import MyBusFeatures from "@/components/bus/MyBusFeatures";
-import FAQSection from "@/components/common/FAQSection";
-import { handleApiError } from "@/lib/utils/handleApiError";
-import { api } from "@/lib/api";
 import TripCard from "@/components/bus/TripCard";
 import { TripData } from "../types/tripSearchResponse";
 import { FaBus } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import { useTripStore } from "../(store)/useTripStore";
+import { useState, useCallback, useTransition } from "react";
+import dynamic from "next/dynamic";
 
-// const iconMap: Record<string, JSX.Element> = {
-//   bus: <FaBusAlt />,
-//   wallet: <GiWallet />,
-//   "credit-card": <MdCreditCard />,
-// };
+// Lazy load heavy components that aren't needed immediately
+const CouponList = dynamic(() => import("@/components/common/CouponList"), {
+  loading: () => <div className="h-32 animate-pulse bg-gray-200" />,
+});
+const StatsBanner = dynamic(() => import("@/components/common/StatsBanner"), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-200" />,
+});
+const LocationList = dynamic(() => import("@/components/common/LocationList"), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-200" />,
+});
+const MyBusFeatures = dynamic(() => import("@/components/bus/MyBusFeatures"), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-200" />,
+});
+const FAQSection = dynamic(() => import("@/components/common/FAQSection"), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-200" />,
+});
 
 export default function Home() {
   const [isSearching, setIsSearching] = useState(false);
-  // const [searchResults, setSearchResults] = useState<TripData[]>([]);
   const [searchError, setSearchError] = useState<string | null>(null);
-   const router = useRouter();
-  const [isNavigating, setIsNavigating] = useState(false);
-  const { searchResults, setSearchResults } = useTripStore();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const { searchResults, setSearchResults, setSelectedTrip } = useTripStore();
 
-  const handleViewSeats = async (tripId: string) => {
-  setIsNavigating(true);
-  router.push(`/trip/${tripId}`);
-};
+  // Memoized handlers for better performance
+  const handleViewSeats = useCallback(
+    (trip: TripData) => {
+      startTransition(() => {
+        // Store the selected trip to avoid refetching
+        setSelectedTrip(trip);
+        router.push(`/trip/${trip._id}`);
+      });
+    },
+    [router, setSelectedTrip]
+  );
 
-  const handleSearch = async (params: { from: string; to: string; date: string; seatType: string }) => {
-    setIsSearching(true);
-    setSearchError(null);
-    // setSearchResults([]);
-    try {
-      const res = await api.get("mytrips/search-trip", { params });
-      setSearchResults(res.data.data);
-    } catch (err) {
-      console.error("search error", err);
-      setSearchError("No trips found for this search.")
-    } finally {
-      setIsSearching(false);
-    }
-  };
+  const handleSearch = useCallback(
+    async (params: { from: string; to: string; date: string; seatType: string }) => {
+      setIsSearching(true);
+      setSearchError(null);
 
-  // const availableSeats = (trip: TripData) =>
-  //   trip.seatPricing.filter((s) => !s.isBooked).length;
+      try {
+        // Use dynamic import for api to reduce initial bundle
+        const { api } = await import("@/lib/api");
+        const res = await api.get("mytrips/search-trip", { params });
+        setSearchResults(res.data.data);
+      } catch (err) {
+        console.error("search error", err);
+        setSearchError("No trips found for this search.");
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [setSearchResults]
+  );
 
-  type SeatPricing = { type?: string; isBooked?: boolean };
+  // Memoized helper functions
+  const availableSeats = useCallback((trip: TripData) => {
+    return trip.seatPricing.filter(
+      (s) => s.seatId !== "Aisle" && s.isBooked === false
+    ).length;
+  }, []);
 
-    const availableSeats = (trip: TripData) =>
-  trip.seatPricing.filter(
-    (s) => s.seatId !== "Aisle" && s.isBooked === false
-  ).length;
-
-
-  const formatDuration = (str: string) => {
+  const formatDuration = useCallback((str: string) => {
     return str.replace("hours", "h").replace("mins", "m");
-  };
+  }, []);
+
+  // Show loading overlay during navigation
+  const showLoadingOverlay = isPending;
 
   return (
     <section className="relative w-full bg-gray-100">
+      {/* Loading overlay during navigation */}
+      {showLoadingOverlay && (
+        <div className="fixed inset-0 bg-black/20 z-50 flex items-center justify-center backdrop-blur-sm">
+          <div className="bg-white rounded-lg p-6 shadow-xl flex items-center gap-4">
+            <FaBus className="text-blue-500 text-2xl animate-busRun" />
+            <span className="font-medium">Loading trip details...</span>
+          </div>
+        </div>
+      )}
+
       {/* ===== Banner Section ===== */}
       <div className="relative w-full h-[200px] sm:h-[280px] md:h-[350px] lg:h-[380px] overflow-hidden">
         <Image
@@ -83,6 +101,7 @@ export default function Home() {
           fill
           priority
           className="object-cover"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-black/60"></div>
       </div>
@@ -97,7 +116,6 @@ export default function Home() {
       {/* ===== Conditional Rendering ===== */}
       {isSearching ? (
         <div className="flex justify-center items-center py-12">
-          {/* <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-600" /> */}
           <div className="flex items-center gap-4">
             <FaBus className="text-blue-500 text-xl animate-busRun" />
             <span>Fetching Data...</span>
@@ -109,21 +127,25 @@ export default function Home() {
         /* ---- RESULTS ---- */
         <div className="mx-auto w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] max-w-6xl mt-6 space-y-6 pb-10">
           {searchResults.map((trip) => (
-            <div key={trip._id} onClick={() => handleViewSeats(trip._id)}>
-            <TripCard
-              busName={trip.bus.name}
-              busType={trip.bus.layoutName}
-              layoutName={trip.bus.layoutName}
-              information={trip.bus.information}
-              departure={trip.departureTime}
-              arrival={trip.arrivalTime}
-              duration={formatDuration(trip.route.duration)}
-              seatsAvailable={availableSeats(trip)}
-              singleSeats={availableSeats(trip)}
-              originalPrice={trip.basePrice}
-              features={trip.bus.features}
-              discountedPrice={trip.basePrice}
-            />
+            <div
+              key={trip._id}
+              onClick={() => handleViewSeats(trip)}
+              className="cursor-pointer"
+            >
+              <TripCard
+                busName={trip.bus.name}
+                busType={trip.bus.layoutName}
+                layoutName={trip.bus.layoutName}
+                information={trip.bus.information}
+                departure={trip.departureTime}
+                arrival={trip.arrivalTime}
+                duration={formatDuration(trip.route.duration)}
+                seatsAvailable={availableSeats(trip)}
+                singleSeats={availableSeats(trip)}
+                originalPrice={trip.basePrice}
+                features={trip.bus.features}
+                discountedPrice={trip.basePrice}
+              />
             </div>
           ))}
         </div>
@@ -135,7 +157,6 @@ export default function Home() {
           <FAQSection />
         </>
       )}
-
     </section>
   );
 }

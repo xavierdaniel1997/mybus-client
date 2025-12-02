@@ -182,6 +182,26 @@ export default function Dashboard() {
     });
   });
 
+  if (isLoading) {
+    return (
+      <div className="p-8 space-y-8 animate-pulse">
+        <div className="w-full flex justify-between gap-10">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="w-full h-32 bg-gray-200 rounded-xl"></div>
+          ))}
+        </div>
+        <div className="flex justify-between gap-10">
+          <div className="w-2/3 h-80 bg-gray-200 rounded-xl"></div>
+          <div className="w-1/3 h-80 bg-gray-200 rounded-xl"></div>
+        </div>
+        <div className="flex justify-between gap-10">
+          <div className="w-2/3 h-64 bg-gray-200 rounded-xl"></div>
+          <div className="w-1/3 h-64 bg-gray-200 rounded-xl"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="text-gray-100 p-8 space-y-8">
       <div className="w-full flex justify-between gap-10">
@@ -249,7 +269,7 @@ export default function Dashboard() {
             page={1}
             rowsPerPage={10}
             totalCount={flatPassengerRows.length}
-            onPageChange={() => {}}
+            onPageChange={() => { }}
             isPagination={false}
           />
         </div>
@@ -260,7 +280,7 @@ export default function Dashboard() {
             page={1}
             rowsPerPage={10}
             totalCount={newUserData.length}
-            onPageChange={() => {}}
+            onPageChange={() => { }}
             isPagination={false}
           />
         </div>

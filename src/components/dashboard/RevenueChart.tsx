@@ -18,7 +18,7 @@ interface Props {
 
 export default function RevenueChart({ data, mode, onModeChange }: Props) {
   return (
-    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-80 flex flex-col gap-4">
+    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-[350px] md:h-[385px] flex flex-col gap-4">
 
       {/* BUTTONS */}
       <div className="flex gap-3 justify-end">
