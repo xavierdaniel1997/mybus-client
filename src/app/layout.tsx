@@ -4,7 +4,7 @@ import { GlobalToaster } from "@/components/common/GlobalToaster";
 import AppLoader from "@/components/layouts/AppLoader";
 
 export const metadata: Metadata = {
-  title: "Bus Booking App",
+  title: "MyBus",
   description: "Book your bus tickets easily",
 };
 
@@ -16,7 +16,6 @@ export default function RootLayout({
   return (
      <html lang="en">
       <body className="relative">
-        {/* <AppLoader /> */}
         {children}
         <GlobalToaster/>
       </body>

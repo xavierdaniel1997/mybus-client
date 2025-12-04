@@ -9,6 +9,7 @@ import {
   FaHeadset,
   FaUser,
   FaAngleDown,
+  FaBusAlt,
 } from "react-icons/fa";
 import mybuslogo from "../../../public/mybuslogo.png";
 import Link from "next/link";
@@ -59,14 +60,18 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
         <div className={`flex justify-between items-center h-16`}>
           {/* Logo Section */}
           <Link href="/">
-          <Image
+          {/* <Image
             src={mybuslogo}
             alt="MyBusGo Logo"
-            width={90}
-            height={90}
+            width={0}
+            height={0}
             priority
-            className="object-cover object-center"
-          />
+             className="w-14 h-14 md:w-20 md:h-20 object-cover object-center"
+          /> */}
+          <div className="flex items-center gap-2 mb-3">
+                      <FaBusAlt size={28} className="text-blue-500" />
+                      <h2 className="text-xl font-bold text-gray-700">MyBus</h2>
+                    </div>
 </Link>
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
@@ -135,7 +140,7 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
         </div>
 
         {/* Mobile Dropdown Menu */}
-        {!isAdmin && mobileMenuOpen && (
+        {/* {!isAdmin && mobileMenuOpen && (
           <div className="md:hidden mt-2 space-y-2 pb-4 animate-fade-in">
             <Link
               href="/booking"
@@ -151,12 +156,52 @@ export default function Navbar({isAdmin = false}: NavbarProps) {
             </Link>
             <button
               className="cursor-pointer flex items-center text-gray-700 hover:text-blue-600 transition"
-              onClick={() => setIsDialogOpen(true)}
+              onClick={() => openDialog()}
             >
               <FaUser className="mr-2" /> Sign In
             </button>
           </div>
-        )}
+        )} */}
+
+        {/* Mobile Menu */}
+{!isAdmin && mobileMenuOpen && (
+  <div className="md:hidden mt-2 space-y-2 pb-4">
+    {user ? (
+      <>
+        <Link
+          href="/booking"
+          className="flex items-center text-gray-700 hover:text-blue-600 transition px-2 py-2"
+        >
+          <FaBusAlt className="mr-2" /> My Bookings
+        </Link>
+
+        <Link
+          href="/profile"
+          className="flex items-center text-gray-700 hover:text-blue-600 transition px-2 py-2"
+        >
+          <FaUser className="mr-2" /> Profile
+        </Link>
+
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center text-left text-gray-700 hover:text-red-600 transition px-2 py-2"
+        >
+          <IoLogOut className="mr-2 text-lg" /> Logout
+        </button>
+      </>
+    ) : (
+      <>
+        <button
+          onClick={openDialog}
+          className="w-full flex items-center text-left text-gray-700 hover:text-blue-600 transition px-2 py-2"
+        >
+          <FaUser className="mr-2" /> Sign In / Login
+        </button>
+      </>
+    )}
+  </div>
+)}
+
       </div>
       {/* <AuthDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} /> */}
       <AuthDialog open={open} onOpenChange={(v) => (v ? openDialog() : closeDialog())} />
