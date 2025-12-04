@@ -137,102 +137,74 @@ export default function PaymentDetails() {
 
 
   return (
-    <div className="mx-auto w-[95%] sm:w-[90%] lg:w-[85%] max-w-6xl px-8 py-12 flex flex-row gap-14">
-      <div className="w-1/2 space-y-4">
-        {/* Top badges */}
-        <div className="flex justify-between text-gray-600 text-sm">
-          <span className="flex gap-2 items-center">🔒 Secure Payment</span>
-          <span className="flex gap-2 items-center">⚡ Superfast Refunds</span>
-          <span className="flex gap-2 items-center">
-            🌟 Trusted by 3.6+ crore Users
-          </span>
-        </div>
+    <main className="w-full bg-gray-50 min-h-screen">
+      <div
+        className="mx-auto w-[95%] sm:w-[90%] lg:w-[85%] max-w-6xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12
+        grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10 lg:gap-14"
+      >
 
-        {/* Coupon */}
-        <div className="bg-white rounded-xl shadow p-4 flex justify-between items-center cursor-pointer">
-          <div className="flex items-center gap-2 font-medium">
-            <MdOutlineContactMail size={20} />
-            Have a coupon code
+        {/* ✅ MOBILE: summary first */}
+        <section className="md:order-1 order-1 w-full space-y-4">
+          {tripData && (
+            <TripSummaryPanel
+              tripData={tripData}
+              stops={stops}
+              selectedSeats={selectedSeats}
+              seatPrice={seatPrice || 0}
+              contact={contact}
+              passengers={passengers}
+            />
+          )}
+        </section>
+
+        {/* ✅ MOBILE: payment last / DESKTOP: payment right */}
+        <section className="md:order-1 order-2 w-full space-y-4">
+
+          {/* Badges */}
+          <div className="flex flex-wrap justify-between text-gray-600 text-xs sm:text-sm gap-2">
+            <span>🔒 Secure Payment</span>
+            <span>⚡ Fast Refunds</span>
+            <span>🌟 Trusted Platform</span>
           </div>
-          <FiChevronRight />
-        </div>
 
-        <Card>
-          <SectionTitle title="Pay with Razorpay" />
-
-          <div className="p-3 flex items-center justify-between cursor-pointer">
-            {/* Left Side */}
-            <div className="flex items-center gap-3">
-              <SiRazorpay size={26} className="text-blue-600" />
-
-              <div>
-                <p className="font-medium">Razorpay Secure Checkout</p>
-                <p className="text-xs text-gray-500">
-                  Cards, UPI, Wallets & Netbanking
-                </p>
-              </div>
+          {/* Coupon */}
+          <div className="bg-white rounded-xl shadow p-3 sm:p-4 flex justify-between items-center cursor-pointer">
+            <div className="flex items-center gap-2 font-semibold text-gray-700">
+              <MdOutlineContactMail size={18} />
+              <span className="text-sm sm:text-base">Have a coupon code</span>
             </div>
-
-            {/* Pay Now Button */}
-            <button
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition"
-              onClick={openRazorpay}
-            >
-              Pay Now
-            </button>
+            <FiChevronRight size={20} />
           </div>
-        </Card>
 
-        {/* Credit / Debit Card */}
-        <Card className="cursor-pointer">
-          <SectionTitle title="Credit/Debit card" />
-          <div className="flex justify-between items-center p-3">
-            <div className="flex items-center gap-3">
-              <GrStripe size={20} />
-              <div>
-                <p className="font-medium">Strip</p>
-                <p className="text-xs text-gray-500">
-                  VISA, MasterCard and more
-                </p>
+          {/* Payment block */}
+          <Card>
+            <header className="pb-2">
+              <SectionTitle title="Pay with Razorpay" />
+            </header>
+
+            <div className="p-2 sm:p-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <SiRazorpay size={28} className="text-blue-600" />
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold">Razorpay Secure Checkout</h3>
+                  <p className="text-[10px] sm:text-xs text-gray-500">
+                    Cards, UPI, Wallets & Netbanking
+                  </p>
+                </div>
               </div>
-            </div>
-             <button
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition"
-              // onClick={}
-            >
-              Pay Now
-            </button>
-          </div>
-        </Card>
 
-        {/* Netbanking */}
-        <Card className="cursor-pointer">
-          <SectionTitle title="Netbanking" />
-          <div className="flex justify-between items-center p-3">
-            <div className="flex items-center gap-3">
-              <LuBanknote size={20} />
-              <div>
-                <p className="font-medium">Search all banks</p>
-                <p className="text-xs text-gray-500">
-                  All major banks available
-                </p>
-              </div>
+              <button
+                onClick={openRazorpay}
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg
+                text-xs sm:text-sm font-medium transition"
+              >
+                Pay Now
+              </button>
             </div>
-            <FiChevronRight />
-          </div>
-        </Card>
+          </Card>
+        </section>
+
       </div>
-
-      <div className="w-1/2">
-       {tripData && <TripSummaryPanel
-            tripData={tripData}
-            stops={stops || []}
-            selectedSeats={selectedSeats}
-            seatPrice={seatPrice || 0}
-            contact={contact}
-            passengers={passengers}
-          />}
-      </div>
-    </div>
+    </main>
   );
 }
