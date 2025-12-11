@@ -160,27 +160,47 @@ export default function Dashboard() {
     phone: user.phone,
   }));
 
+  // const flatPassengerRows = newBookings.flatMap((booking) => {
+  //   return booking.passengers.map((p) => {
+  //     return {
+  //       bookingId: booking._id,
+  //       passengerName: p.name,
+  //       seatId: p.seatId,
+  //       route: booking?.trip?.route?.routeName,
+  //       busName: booking.trip.bus.name,
+  //       travelDate: new Date(booking.trip.travelDate)
+  //         .toISOString()
+  //         .split("T")[0],
+  //       boarding: booking.boardingPoint.landmark,
+  //       dropping: booking.droppingPoint.landmark,
+  //       contactEmail: booking.contact.email,
+  //       contactPhone: booking.contact.phone,
+  //       userName: `${booking.user.firstName} ${booking.user.lastName}`,
+  //     };
+  //   });
+  // });
+
+
   const flatPassengerRows = newBookings.flatMap((booking) => {
-    // console.log("Booking__", booking)
-    return booking.passengers.map((p) => {
-      // console.log("Passenger__", p);
-      return {
-        bookingId: booking._id,
-        passengerName: p.name,
-        seatId: p.seatId,
-        route: booking.trip.route.routeName,
-        busName: booking.trip.bus.name,
-        travelDate: new Date(booking.trip.travelDate)
-          .toISOString()
-          .split("T")[0],
-        boarding: booking.boardingPoint.landmark,
-        dropping: booking.droppingPoint.landmark,
-        contactEmail: booking.contact.email,
-        contactPhone: booking.contact.phone,
-        userName: `${booking.user.firstName} ${booking.user.lastName}`,
-      };
-    });
-  });
+  return booking.passengers.map((p) => ({
+    bookingId: booking._id,
+    passengerName: p.name,
+    seatId: p.seatId,
+    route: booking.trip?.route?.routeName ?? "-",
+    busName: booking.trip?.bus?.name ?? "-",
+    travelDate: booking.trip?.travelDate
+      ? new Date(booking.trip.travelDate).toISOString().split("T")[0]
+      : "-",
+    boarding: booking.boardingPoint?.landmark ?? "-",
+    dropping: booking.droppingPoint?.landmark ?? "-",
+    contactEmail: booking.contact?.email ?? "-",
+    contactPhone: booking.contact?.phone ?? "-",
+    userName: booking.user
+      ? `${booking.user.firstName} ${booking.user.lastName}`
+      : "-",
+  }));
+});
+
 
   if (isLoading) {
     return (
