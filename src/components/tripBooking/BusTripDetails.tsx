@@ -67,58 +67,27 @@ const scrollContainer = (direction: "left" | "right") => {
         </div>
       </div>
 
-      {/* Image Section */}
-      {/* <div className="flex items-center overflow-x-auto">
-        {tripData?.bus.images.map((img) => (
-          <Image
-            key={img}
-            src={img}
-            alt="Bus"
-            width={0}
-            height={0}
-            unoptimized
-            className="p-2 object-cover w-60 h-44 rounded-xl"
-          />
-        ))}
-      </div> */}
 
       {/* Image Carousel */}
 <div className="relative w-full overflow-hidden">
   {/* Left Button */}
-  <button
+  {/* <button
     onClick={() => scrollContainer("left")}
     className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full shadow hover:bg-white/20 z-10"
   >
     <BsChevronLeft size={16} />
-  </button>
+  </button> */}
 
-  {/* Images wrapper */}
-  {/* <div
-    ref={imageScrollRef}
-    className="flex overflow-x-hidden scroll-smooth gap-3 px-2"
-  >
-    {tripData?.bus.images.map((img) => (
-      <Image
-        key={img}
-        src={img}
-        alt="Bus"
-        width={240}
-        height={180}
-        unoptimized
-        className="object-cover rounded-xl"
-      />
-    ))}
-  </div> */}
 
   <BusImageCarousel images={tripData?.bus.images || []} />
 
   {/* Right Button */}
-  <button
+  {/* <button
     onClick={() => scrollContainer("right")}
     className="absolute right-2 top-1/2 -translate-y-1/2  p-2 rounded-full hover:bg-white/30 z-10"
   >
     <BsChevronRight size={16} />
-  </button>
+  </button> */}
 </div>
 
 
